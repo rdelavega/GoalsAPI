@@ -1,0 +1,1 @@
+function completeGoal(id) {}
