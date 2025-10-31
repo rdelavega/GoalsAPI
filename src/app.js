@@ -12,8 +12,7 @@ app.get("/goals", (req, res) => {
   if (goals.length === 0) {
     return res.status(404).send("No Goals added in db");
   }
-  res.send(goals);
-  console.log(goals[0]);
+  res.status(200).json(goals);
 });
 
 app.get("/goals/:id", (req, res) => {
@@ -24,10 +23,10 @@ app.get("/goals/:id", (req, res) => {
     return res.status(404).send("Goal not found");
   }
 
-  res.send(goalToFind);
+  res.status(200).json(goalToFind);
 });
 
-app.get("/completed", (req, res) => {
+app.get("/goals/completed", (req, res) => {
   const completed = goals.filter((goal) => goal.completed === true);
 
   if (completed.length === 0) {
@@ -37,10 +36,20 @@ app.get("/completed", (req, res) => {
   res.status(200).json(completed);
 });
 
+app.get("/goals/incompleted", (req, res) => {
+  const incompleted = goals.filter((goal) => goal.completed === false);
+
+  if (incompleted.length === 0) {
+    return res.status(404).send("Error 404. Incompleted Goals not found");
+  }
+
+  res.status(200).json(incompleted);
+});
+
 app.post("/goals", (req, res) => {
   const { id, name, start_date, end_date, completed } = req.body;
 
-  const findExistingGoal = goals.find((goal) => goal.id === id);
+  const findExistingGoal = goals.find((goal) => goal.id === parseInt(id));
 
   if (findExistingGoal) {
     return res.status(400).send("Attempting to create goal with same id");
@@ -53,7 +62,7 @@ app.post("/goals", (req, res) => {
 app.post("/goals/validate/:id", (req, res) => {
   const { id } = req.params;
 
-  const goalToComplete = goals.find((goal) => goal.id === id);
+  const goalToComplete = goals.find((goal) => goal.id === parseInt(id));
 
   if (!goalToComplete) {
     res.status(404).send("Goal not found");
@@ -67,7 +76,7 @@ app.post("/goals/validate/:id", (req, res) => {
 app.post("/goals/invalidate/:id", (req, res) => {
   const { id } = req.params;
 
-  const goalToIncomplete = goals.find((goal) => goal.id === id);
+  const goalToIncomplete = goals.find((goal) => goal.id === parseInt(id));
 
   if (!goalToIncomplete) {
     res.status(404).send("Goal not found");
@@ -77,15 +86,14 @@ app.post("/goals/invalidate/:id", (req, res) => {
   res.status(200)(`Goal with ID ${id} marked as incompleted`);
 });
 
-// TODO: Repair put route for updating goals
 app.put("/goals/:id", (req, res) => {
   const { id } = req.params;
   const updatedGoalData = req.body;
 
-  const goalToUpdateIndex = goals.findIndex((goal) => goal.id === id);
+  const goalToUpdateIndex = goals.findIndex((goal) => goal.id === parseInt(id));
 
   if (goalToUpdateIndex !== -1) {
-    goals[goalToUpdateIndex] = { ...updatedGoalData, id: id };
+    goals[goalToUpdateIndex] = { id: id, ...updatedGoalData };
     res.status(200).json(goals[goalToUpdateIndex]);
   } else {
     res.status(404).json({ message: "Goal not found" });
@@ -94,13 +102,15 @@ app.put("/goals/:id", (req, res) => {
 
 app.delete("/goals/:id", (req, res) => {
   const { id } = req.params;
-  const deletedGoal = goals.filter((goal) => goal.id !== id);
+  const indexGoalToDelete = goals.findIndex((goal) => goal.id === parseInt(id));
 
-  if (!deletedGoal) {
+  if (!indexGoalToDelete) {
     return res.status(404).send("Goal not found");
   }
 
-  res.send(`Deleted Goal with ID: ${id}, Goals remaining: ${deletedGoal}`);
+  delete goals[indexGoalToDelete];
+
+  res.send(`Deleted Goal with ID: ${id}, Goals remaining: ${goals}`);
 });
 
 app.listen(port, () => {
