@@ -1,4 +1,5 @@
 const { goals } = require("../data/goals.json");
+const fs = require("fs");
 
 function getGoals(req, res) {
   if (goals.length === 0) {
