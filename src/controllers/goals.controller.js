@@ -1,13 +1,27 @@
-const { goals } = require("../data/goals.json");
+// const { goals } = require("../data/goals.json");
 const sendResponse = require("../utils/sendResponse");
+const fs = require("fs");
+const { readFile } = require("fs/promises");
+const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
 
-function getGoals(req, res) {
-  if (goals.length === 0) {
-    return sendResponse(res, 404, "error", "No goals were found");
-  }
-  sendResponse(res, 200, `Total goals: ${goals.length}`, goals);
+async function getGoals(req, res) {
+  fs.readFile(filePath, "utf8", (err, jsonString) => {
+    if (err) {
+      console.error("Error reading file:", err);
+      return;
+    }
+    try {
+      const data = JSON.parse(jsonString);
+      sendResponse(res, 200, "Goals", data);
+      // You can now work with the 'data' object
+    } catch (parseErr) {
+      console.error("Error parsing JSON:", parseErr);
+      sendResponse(res, 500, "Error", parseErr);
+    }
+  });
 }
 
+// TODO implement fs read and  write for data persistance
 function getGoalById(req, res) {
   const { id } = req.params;
   const goalToFind = goals.find((goal) => goal.id === parseInt(id));
