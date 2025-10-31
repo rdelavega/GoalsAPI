@@ -1,65 +1,72 @@
 const { goals } = require("../data/goals.json");
-const fs = require("fs");
+const sendResponse = require("../utils/sendResponse");
 
 function getGoals(req, res) {
   if (goals.length === 0) {
-    return res.status(404).send("No Goals added in db");
+    return sendResponse(res, 404, "error", "No goals were found");
   }
-  res.status(200).json(goals);
+  sendResponse(res, 200, `Total goals: ${goals.length}`, goals);
 }
 
 function getGoalById(req, res) {
   const { id } = req.params;
-  goalToFind = goals.find((goal) => goal.id === parseInt(id));
+  const goalToFind = goals.find((goal) => goal.id === parseInt(id));
 
   if (!goalToFind) {
-    return res.status(404).send("Goal not found, Es el de id");
+    return sendResponse(res, 404, "error", "Goal not found");
   }
 
-  res.status(200).json(goalToFind);
+  sendResponse(res, 200, `Goal ${id}`, goalToFind);
 }
 
 function getCompletedGoals(req, res) {
   const completed = goals.filter((goal) => goal.completed === true);
 
   if (completed.length === 0) {
-    return res.status(404).send("Error 404. Completed Goals not found");
+    return sendResponse(res, 404, "error", "Incompleted goals not found");
   }
 
-  res.status(200).json(completed);
+  sendResponse(res, 200, `Goals completed`, completed);
 }
 
 function getIncompletedGoals(req, res) {
   const incompleted = goals.filter((goal) => goal.completed === false);
 
   if (incompleted.length === 0) {
-    return res.status(404).send("Error 404. Incompleted Goals not found");
+    return sendResponse(res, 404, "error", "incompleted goals not found");
   }
 
-  res.status(200).json(incompleted);
+  sendResponse(res, 200, `Goals incompleted`, incompleted);
 }
 
 function createGoal(req, res) {
+  const { id, name, start_date, end_date, completed } = req.body;
   const findExistingGoal = goals.find((goal) => goal.id === parseInt(id));
 
   if (findExistingGoal) {
-    return res.status(400).send("Attempting to create goal with same id");
+    return sendResponse(
+      res,
+      409,
+      "Error",
+      "Theres an already existing goal with that id"
+    );
   }
 
   goals.push({ id, name, start_date, end_date, completed });
-  res.status(201).send("Created goal with ID", id);
+  sendResponse(res, 201, "Goal Created", goals);
 }
 
 function validateGoalById(req, res) {
+  const { id } = req.params;
   const goalToComplete = goals.find((goal) => goal.id === parseInt(id));
 
   if (!goalToComplete) {
-    return res.status(404).send("Goal not found");
+    return sendResponse(res, 404, "Error", "Goal not found");
   }
 
   goalToComplete.completed = true;
 
-  res.status(200).send(`Goal with ID ${id} completed`);
+  sendResponse(res, 200, "Goal marked as completed", goalToComplete);
 }
 
 function invalidateGoalById(req, res) {
@@ -68,24 +75,32 @@ function invalidateGoalById(req, res) {
   const goalToIncomplete = goals.find((goal) => goal.id === parseInt(id));
 
   if (!goalToIncomplete) {
-    return res.status(404).send("Goal not found");
+    return sendResponse(res, 404, "Error", "Goal not found");
   }
 
   goalToIncomplete.completed = false;
-  res.status(200)(`Goal with ID ${id} marked as incompleted`);
+  sendResponse(res, 200, "Goal marked as incomplete", goalToIncomplete);
 }
 
 function updateGoal(req, res) {
   const { id } = req.params;
   const updatedGoalData = req.body;
 
+  if (!updatedGoalData) {
+    return sendResponse(res, 404, "Error", "There is no payload for update");
+  }
+
+  if (updatedGoalData.id) {
+    return sendResponse(res, 409, "Error", "You can't updated goal ID");
+  }
+
   const goalToUpdateIndex = goals.findIndex((goal) => goal.id === parseInt(id));
 
   if (goalToUpdateIndex !== -1) {
     goals[goalToUpdateIndex] = { id: id, ...updatedGoalData };
-    return res.status(200).json(goals[goalToUpdateIndex]);
+    return sendResponse(res, 200, "Updated", goals[goalToUpdateIndex]);
   } else {
-    return res.status(404).json({ message: "Goal not found" });
+    sendResponse(res, 404, "Error", "Goal not found");
   }
 }
 
@@ -93,13 +108,18 @@ function deleteGoal(req, res) {
   const { id } = req.params;
   const indexGoalToDelete = goals.findIndex((goal) => goal.id === parseInt(id));
 
-  if (!indexGoalToDelete) {
-    return res.status(404).send("Goal not found");
+  if (indexGoalToDelete === -1) {
+    return sendResponse(res, 404, "Error", "Goal not found");
   }
 
-  delete goals[indexGoalToDelete];
+  goals.splice(indexGoalToDelete, 1);
 
-  res.send(`Deleted Goal with ID: ${id}, Goals remaining: ${goals}`);
+  sendResponse(
+    res,
+    200,
+    `Deleted Goal with ID: ${id}, Goals remaining: ${goals.length}`,
+    goals
+  );
 }
 
 module.exports = {
