@@ -2,11 +2,12 @@
 const { json } = require("express");
 const sendResponse = require("../utils/sendResponse");
 const fs = require("fs");
-const { readFile } = require("fs/promises");
-const filePath = "/home/rdlvg/Ejercicios/GoalsAPI/src/data/goals.json";
+const { readFile, writeFile } = require("fs/promises");
+//Config
+const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
 
-function getGoals(req, res) {
-  fs.readFile(filePath, "utf8", (err, jsonString) => {
+async function getGoals(req, res) {
+  await readFile(filePath, "utf8", (err, jsonString) => {
     if (err) {
       return sendResponse(res, 500, "Error", err);
     }
@@ -20,17 +21,16 @@ function getGoals(req, res) {
   });
 }
 
-function getGoalById(req, res) {
+async function getGoalById(req, res, next) {
   const { id } = req.params;
 
-  fs.readFile(filePath, "utf-8", (err, jsonString) => {
+  const content = await readFile(filePath, "utf-8", (err, jsonString) => {
     if (err) {
       return sendResponse(res, 500, "Error", err);
     }
 
     try {
       const goals = JSON.parse(jsonString);
-      console.log(goals);
       const goalToFind = goals.find((goal) => goal.id === parseInt(id));
 
       if (!goalToFind) {
@@ -44,36 +44,37 @@ function getGoalById(req, res) {
   });
 }
 
-function getCompletedGoals(req, res) {
-  fs.readFile(filePath, "utf-8", (err, jsonString) => {
+async function getCompletedGoals(req, res) {
+  const content = await readFile(filePath, "utf-8", (err) => {
     if (err) {
       return sendResponse(res, 500, "Error", err);
     }
     try {
-      const goals = JSON.parse(jsonString);
-      const completed = goals.filter((goal) => goal.completed === true);
-      if (completed.length === 0) {
+      const goals = JSON.parse(content);
+      const completedGoals = goals.filter((goal) => goal.completed === true);
+      if (completedGoals.length === 0) {
         return sendResponse(res, 404, "error", "Completed goals not found");
       }
-      sendResponse(res, 200, "Goals", completed);
+      sendResponse(res, 200, "Goals", completedGoals);
     } catch (err) {
       sendResponse(res, 500, "Error", err);
     }
   });
 }
 
-function getIncompletedGoals(req, res) {
-  fs.readFile(filePath, "utf-8", (err, jsonString) => {
+async function getIncompletedGoals(req, res) {
+  await readFile(filePath, "utf-8", (err, jsonString) => {
     if (err) {
       return sendResponse(res, 500, "Error", err);
     }
     try {
       const goals = JSON.parse(jsonString);
-      const incompleted = goals.filter((goal) => goal.completed === false);
-      if (incompleted.length === 0) {
+      console.log(goals);
+      const incompletedGoals = goals.filter((goal) => goal.completed === false);
+      if (incompletedGoals.length === 0) {
         return sendResponse(res, 404, "error", "Incompleted goals not found");
       }
-      sendResponse(res, 200, "Goals", incompleted);
+      sendResponse(res, 200, "Goals", incompletedGoals);
     } catch (err) {
       sendResponse(res, 500, "Error", err);
     }
@@ -104,7 +105,6 @@ function createGoal(req, res) {
     }
 
     goals.push(goalData);
-    console.log(goals);
 
     const goalsDataString = JSON.stringify(goals, null, 2);
     fs.writeFile(filePath, goalsDataString, (err) => {

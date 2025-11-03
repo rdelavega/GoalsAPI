@@ -4,11 +4,11 @@ const goalsController = require("../controllers/goals.controller");
 
 router.get("/goals", goalsController.getGoals);
 
+router.get("/goals/completed/", goalsController.getCompletedGoals);
+
+router.get("/goals/incompleted/", goalsController.getIncompletedGoals);
+
 router.get("/goals/:id", goalsController.getGoalById);
-
-router.get("/completed", goalsController.getCompletedGoals);
-
-router.get("/incompleted", goalsController.getIncompletedGoals);
 
 router.post("/goals", goalsController.createGoal);
 
