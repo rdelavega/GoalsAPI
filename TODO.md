@@ -2,11 +2,11 @@
 
 ### **1 Refactorización y limpieza de la API**
 
-- [ ] Revisar todos los controllers y unificar el estilo de manejo de errores (usar `try/catch` en todos o callbacks de `fs` consistentes).
+- ✅ Revisar todos los controllers y unificar el estilo de manejo de errores (usar `try/catch` en todos o callbacks de `fs` consistentes).
 - [ ] Revisar los nombres de variables y consistencia (ej. `incompleted` → `incomplete`).
-- [ ] Asegurarte de que **todas las rutas tengan sendResponse** con estructura consistente `{status, message, data}`.
+- ✅ Asegurarte de que **todas las rutas tengan sendResponse** con estructura consistente `{status, message, data}`.
 - [ ] Revisar validaciones de payloads (`req.body`) en **create** y **update**.
-- [ ] Revisar que **las rutas literales se declaren antes de las dinámicas** (`/goals/completed` antes de `/goals/:id`).
+- ✅ Revisar que **las rutas literales se declaren antes de las dinámicas** (`/goals/completed` antes de `/goals/:id`).
 
 ---
 
@@ -14,7 +14,7 @@
 
 - [ ] Consolidar la lectura y escritura del JSON para evitar race conditions (leer, modificar, escribir correctamente).
 - [ ] Manejar errores de lectura/escritura de manera uniforme.
-- [ ] Revisar que **las operaciones POST no sobreescriban todo**, sino que **pusheen al array y escriban el nuevo array**.
+- ✅ Revisar que **las operaciones POST no sobreescriban todo**, sino que **pusheen al array y escriban el nuevo array**.
 - [ ] Opcional: crear un helper `readJSON` y `writeJSON` para abstraer `fs.readFile` y `fs.writeFile`.
 
 ---

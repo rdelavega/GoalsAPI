@@ -3,95 +3,102 @@ const { json } = require("express");
 const sendResponse = require("../utils/sendResponse");
 const fs = require("fs");
 const { readFile, writeFile } = require("fs/promises");
+const readJson = require("../utils/readJson");
 //Config
-const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
+const filePath = "/home/rdlvg/Ejercicios/GoalsAPI/src/data/goals.json";
 
+// TODO implement readJson and writeJson functions for separating and cleaning code
 async function getGoals(req, res) {
-  await readFile(filePath, "utf8", (err, jsonString) => {
-    if (err) {
-      return sendResponse(res, 500, "Error", err);
-    }
-    try {
-      const data = JSON.parse(jsonString);
-      sendResponse(res, 200, "Goals", data);
-      // You can now work with the 'data' object
-    } catch (parseErr) {
-      sendResponse(res, 500, "Error", parseErr);
-    }
-  });
+  try {
+    const goals = await readJson(filePath, res);
+    sendResponse(res, 200, "Goals", goals);
+  } catch (parseErr) {
+    sendResponse(res, 500, "Error", parseErr);
+  }
 }
 
 async function getGoalById(req, res, next) {
   const { id } = req.params;
 
-  const content = await readFile(filePath, "utf-8", (err, jsonString) => {
-    if (err) {
-      return sendResponse(res, 500, "Error", err);
+  try {
+    const goals = await readJson(filePath, res);
+    const goalToFind = goals.find((goal) => goal.id === parseInt(id));
+
+    if (!goalToFind) {
+      return sendResponse(res, 404, "error", "Goal not found");
     }
 
-    try {
-      const goals = JSON.parse(jsonString);
-      const goalToFind = goals.find((goal) => goal.id === parseInt(id));
-
-      if (!goalToFind) {
-        return sendResponse(res, 404, "error", "Goal not found");
-      }
-
-      sendResponse(res, 200, `Goal ${id}`, goalToFind);
-    } catch (err) {
-      sendResponse(res, 500, "Error", err);
-    }
-  });
+    sendResponse(res, 200, `Goal ${id}`, goalToFind);
+  } catch (err) {
+    sendResponse(res, 500, "Error", err);
+  }
 }
 
 async function getCompletedGoals(req, res) {
-  const content = await readFile(filePath, "utf-8", (err) => {
-    if (err) {
-      return sendResponse(res, 500, "Error", err);
+  try {
+    const content = await readFile(filePath, { encoding: "utf8" });
+    if (!content) {
+      sendResponse(res, 404, "Error", "Couldn't read file");
     }
-    try {
-      const goals = JSON.parse(content);
-      const completedGoals = goals.filter((goal) => goal.completed === true);
-      if (completedGoals.length === 0) {
-        return sendResponse(res, 404, "error", "Completed goals not found");
-      }
-      sendResponse(res, 200, "Goals", completedGoals);
-    } catch (err) {
-      sendResponse(res, 500, "Error", err);
+    const goals = JSON.parse(content);
+    const completedGoals = goals.filter((goal) => goal.completed === true);
+    if (completedGoals.length === 0) {
+      return sendResponse(res, 404, "error", "Completed goals not found");
     }
-  });
+    sendResponse(res, 200, "Goals", completedGoals);
+  } catch (err) {
+    sendResponse(res, 500, "Error", err);
+  }
 }
 
 async function getIncompletedGoals(req, res) {
-  await readFile(filePath, "utf-8", (err, jsonString) => {
-    if (err) {
-      return sendResponse(res, 500, "Error", err);
+  try {
+    const content = readFile(filePath, { encoding: "utf8" });
+    if (!content) {
+      sendResponse(res, 404, "Error", "Couldn't read file");
     }
-    try {
-      const goals = JSON.parse(jsonString);
-      console.log(goals);
-      const incompletedGoals = goals.filter((goal) => goal.completed === false);
-      if (incompletedGoals.length === 0) {
-        return sendResponse(res, 404, "error", "Incompleted goals not found");
-      }
-      sendResponse(res, 200, "Goals", incompletedGoals);
-    } catch (err) {
-      sendResponse(res, 500, "Error", err);
+    const goals = JSON.parse(content);
+    const incompletedGoals = goals.filter((goal) => goal.completed === false);
+    if (incompletedGoals.length === 0) {
+      return sendResponse(res, 404, "error", "Incompleted goals not found");
     }
-  });
+    sendResponse(res, 200, "Goals", incompletedGoals);
+  } catch (err) {
+    sendResponse(res, 500, "Error", err);
+  }
 }
 
-function createGoal(req, res) {
+async function createGoal(req, res) {
   const goalData = req.body;
 
   if (!goalData) {
-    return sendResponse(res, 404, "Error", "There is no payload for update");
+    return sendResponse(
+      res,
+      409,
+      "Error",
+      "There is no payload for creating a goal"
+    );
   }
-  fs.readFile(filePath, "utf-8", (err, jsonString) => {
-    if (err) {
-      return sendResponse(res, 500, "Error reading file", err);
+  if (
+    !goalData.name |
+    !goalData.start_date |
+    !goalData.end_date |
+    !goalData.completed
+  ) {
+    return sendResponse(
+      res,
+      409,
+      "Error",
+      "There is no data for creating goal"
+    );
+  }
+
+  try {
+    const content = await readFile(filePath, { encoding: "utf8" });
+    if (!content) {
+      return sendResponse(res, 404, "Error", "Couldn't read file");
     }
-    const goals = JSON.parse(jsonString);
+    const goals = JSON.parse(content);
     const existingGoal = goals.find(
       (goal) => goal.id === parseInt(goalData.id)
     );
@@ -105,26 +112,23 @@ function createGoal(req, res) {
     }
 
     goals.push(goalData);
-
     const goalsDataString = JSON.stringify(goals, null, 2);
-    fs.writeFile(filePath, goalsDataString, (err) => {
-      if (err) {
-        return sendResponse(res, 500, "Error writing file", err);
-      }
-
-      sendResponse(res, 201, "Goal Created", goalData);
-    });
-  });
+    await writeFile(filePath, goalsDataString);
+    sendResponse(res, 201, "Goal Created", goalData);
+  } catch (err) {
+    sendResponse(res, 500, "Error Creating Goal", err);
+  }
 }
 
-function validateGoalById(req, res) {
+async function validateGoalById(req, res) {
   const { id } = req.params;
 
-  fs.readFile(filePath, "utf-8", (err, jsonString) => {
-    if (err) {
-      return sendResponse(res, 500, "Error reading file", err);
+  try {
+    const content = await readFile(filePath, { encoding: "utf8" });
+    if (!content) {
+      return sendResponse(res, 404, "Error", "Couldn't read file");
     }
-    const goals = JSON.parse(jsonString);
+    const goals = JSON.parse(content);
     const goalToCompleteIndex = goals.findIndex(
       (goal) => goal.id === parseInt(id)
     );
@@ -137,29 +141,24 @@ function validateGoalById(req, res) {
 
     const goalsDataString = JSON.stringify(goals, null, 2);
 
-    fs.writeFile(filePath, goalsDataString, (err) => {
-      if (err) {
-        return sendResponse(res, 500, "Error writing file", err);
-      }
+    await writeFile(filePath, goalsDataString);
 
-      sendResponse(
-        res,
-        200,
-        "Goal marked as completed",
-        goals[goalToCompleteIndex]
-      );
-    });
-  });
+    sendResponse(
+      res,
+      200,
+      "Goal marked as completed",
+      goals[goalToCompleteIndex]
+    );
+  } catch (err) {
+    sendResponse(res, 500, "Error validating goal", err);
+  }
 }
 
-function invalidateGoalById(req, res) {
+async function invalidateGoalById(req, res) {
   const { id } = req.params;
-
-  fs.readFile(filePath, "utf-8", (err, jsonString) => {
-    if (err) {
-      return sendResponse(res, 500, "Error reading file", err);
-    }
-    const goals = JSON.parse(jsonString);
+  try {
+    const content = await readFile(filePath, { encoding: "utf8" });
+    const goals = JSON.parse(content);
     const goalToIncompleteIndex = goals.findIndex(
       (goal) => goal.id === parseInt(id)
     );
@@ -171,23 +170,20 @@ function invalidateGoalById(req, res) {
     goals[goalToIncompleteIndex].completed = false;
 
     const goalsDataString = JSON.stringify(goals, null, 2);
+    await writeFile(filePath, goalsDataString);
 
-    fs.writeFile(filePath, goalsDataString, (err) => {
-      if (err) {
-        return sendResponse(res, 500, "Error writing file", err);
-      }
-
-      sendResponse(
-        res,
-        200,
-        "Goal marked as completed",
-        goals[goalToIncompleteIndex]
-      );
-    });
-  });
+    sendResponse(
+      res,
+      200,
+      "Goal marked as incompleted",
+      goals[goalToIncompleteIndex]
+    );
+  } catch (err) {
+    sendResponse(res, 500, "Error validating goal", err);
+  }
 }
 
-function updateGoal(req, res) {
+async function updateGoal(req, res) {
   const { id } = req.params;
   const updatedGoalData = req.body;
 
@@ -196,13 +192,11 @@ function updateGoal(req, res) {
   }
 
   if (updatedGoalData.id) {
-    return sendResponse(res, 409, "Error", "You can't updated goal ID");
+    return sendResponse(res, 409, "Error", "You can't update the goal ID.");
   }
-  fs.readFile(filePath, "utf-8", (err, jsonString) => {
-    if (err) {
-      return sendResponse(res, 500, "Error reading file", err);
-    }
-    const goals = JSON.parse(jsonString);
+  try {
+    const content = await readFile(filePath, { encoding: "utf8" });
+    const goals = JSON.parse(content);
     const goalToUpdateIndex = goals.findIndex(
       (goal) => goal.id === parseInt(id)
     );
@@ -213,31 +207,20 @@ function updateGoal(req, res) {
     goals[goalToUpdateIndex] = { id: parseInt(id), ...updatedGoalData };
 
     const goalsDataString = JSON.stringify(goals, null, 2);
+    await writeFile(filePath, goalsDataString);
 
-    fs.writeFile(filePath, goalsDataString, (err) => {
-      if (err) {
-        return sendResponse(res, 500, "Error writing file", err);
-      }
-
-      sendResponse(
-        res,
-        200,
-        `Goal with ${id} updated`,
-        goals[goalToUpdateIndex]
-      );
-    });
-  });
+    sendResponse(res, 200, `Goal with ${id} updated`, goals[goalToUpdateIndex]);
+  } catch (err) {
+    sendResponse(res, 500, "Error updating goal", err);
+  }
 }
 
-function deleteGoal(req, res) {
+async function deleteGoal(req, res) {
   const { id } = req.params;
 
-  fs.readFile(filePath, "utf-8", (err, jsonString) => {
-    if (err) {
-      return sendResponse(res, 500, "Error reading file", err);
-    }
-
-    const goals = JSON.parse(jsonString);
+  try {
+    const content = await readFile(filePath, { encoding: "utf8" });
+    const goals = JSON.parse(content);
     const goalToDeleteIndex = goals.findIndex(
       (goal) => goal.id === parseInt(id)
     );
@@ -249,20 +232,17 @@ function deleteGoal(req, res) {
     goals.splice(goalToDeleteIndex, 1);
 
     const goalsDataString = JSON.stringify(goals, null, 2);
+    await writeFile(filePath, goalsDataString);
 
-    fs.writeFile(filePath, goalsDataString, (err) => {
-      if (err) {
-        return sendResponse(res, 500, "Error writing file", err);
-      }
-
-      sendResponse(
-        res,
-        200,
-        `Goal with ID ${id} deleted. Goals remaining: ${goals.length}`,
-        goals
-      );
-    });
-  });
+    sendResponse(
+      res,
+      200,
+      `Goal with ID ${id} deleted. Goals remaining: ${goals.length}`,
+      goals
+    );
+  } catch (err) {
+    sendResponse(res, 500, "Error updating goal", err);
+  }
 }
 
 module.exports = {
