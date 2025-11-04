@@ -1,9 +1,8 @@
-const express = require("express");
-const goalsRoutes = require("./routes/goal.routes");
-const cors = require("cors");
+import express from "express";
+import goalsRoutes from "./routes/goal.routes.js";
+import cors from "cors";
 
 const app = express();
-const port = 4001;
 
 app.use(cors());
 
@@ -21,6 +20,4 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`App listening on port http://localhost:${port}`);
-});
+export default app;

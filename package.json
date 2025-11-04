@@ -1,10 +1,12 @@
 {
   "name": "goalsapi",
   "version": "1.0.0",
+  "type": "module",
   "description": "Goals API for coding practice",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node src/server.js",
+    "test": "mocha \"tests/**/*.test.js\""
   },
   "author": "Rodrigo De la Vega",
   "license": "ISC",
@@ -12,5 +14,11 @@
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "chai": "^6.2.0",
+    "chai-http": "^5.1.2",
+    "mocha": "^11.7.4",
+    "supertest": "^7.1.4"
   }
 }

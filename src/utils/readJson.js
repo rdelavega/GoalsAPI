@@ -1,5 +1,5 @@
-const { readFile } = require("fs/promises");
-const sendResponse = require("./sendResponse.js");
+import { readFile } from "fs/promises";
+import sendResponse from "./sendResponse.js";
 
 async function readJson(filePath, res) {
   try {
@@ -14,4 +14,4 @@ async function readJson(filePath, res) {
   }
 }
 
-module.exports = readJson;
+export default readJson;
