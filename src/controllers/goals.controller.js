@@ -9,6 +9,7 @@ import findIndexById from "../utils/findIndexById.js";
 //Config
 const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
 
+// TODO check consistencies on success and error messages, as in function names and params
 async function getGoals(req, res) {
   try {
     const goals = await readJson(filePath, res);
@@ -30,22 +31,13 @@ async function getGoalById(req, res) {
   }
 }
 
-// TODO: Refactor routes with query ?status=complete/incomplete instead of True = Completed, False = Incompleted
-async function getCompletedGoals(req, res) {
+async function getGoalsByStatus(req, res) {
+  const searchStatus = req.query.q;
+  const statusValue = searchStatus === "complete" ? true : false;
   try {
     const goals = await readJson(filePath, res);
-    const completedGoals = filterGoals(res, goals, true);
-    sendResponse(res, 200, "Goals", completedGoals);
-  } catch (err) {
-    sendResponse(res, 500, "Error", err);
-  }
-}
-
-async function getIncompletedGoals(req, res) {
-  try {
-    const goals = await readJson(filePath, res);
-    const incompletedGoals = filterGoals(res, goals, false);
-    sendResponse(res, 200, "Goals", incompletedGoals);
+    const goalsByStatus = filterGoals(res, goals, statusValue);
+    sendResponse(res, 200, "Goals", goalsByStatus);
   } catch (err) {
     sendResponse(res, 500, "Error", err);
   }
@@ -97,7 +89,7 @@ async function createGoal(req, res) {
   }
 }
 
-// TODO validate from query instead of 2 routes for completing or incompleting
+// TODO Refactor: validate from query instead of 2 routes for completing or incompleting
 async function completeGoalById(req, res) {
   const { id } = req.params;
 
@@ -183,8 +175,7 @@ async function deleteGoal(req, res) {
 const goalsController = {
   getGoals,
   getGoalById,
-  getCompletedGoals,
-  getIncompletedGoals,
+  getGoalsByStatus,
   createGoal,
   completeGoalById,
   incompleteGoalById,

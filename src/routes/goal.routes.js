@@ -5,9 +5,7 @@ const router = express.Router();
 
 router.get("/goals", goalsController.getGoals);
 
-router.get("/goals/completed/", goalsController.getCompletedGoals);
-
-router.get("/goals/incompleted/", goalsController.getIncompletedGoals);
+router.get("/goals/status", goalsController.getGoalsByStatus);
 
 router.get("/goals/:id", goalsController.getGoalById);
 

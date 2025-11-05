@@ -8,9 +8,11 @@ import { writeFileSync } from "fs";
 
 //Config
 const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
-// TODO pass all test suites
+// TODO: pass all test suites
 describe("API CRUD operations", () => {
   // *Passed
+
+  // TODO: refactor test with new getGoalsByStatus route
   describe("GET /api/goals/", () => {
     it("should get all goals", async () => {
       const res = await request(app).get("/api/goals");
@@ -25,19 +27,19 @@ describe("API CRUD operations", () => {
     });
 
     it("should get all completed goals", async () => {
-      const res = await request(app).get("/api/goals/completed");
+      const res = await request(app).get("/api/goals/status?q=complete");
       expect(res.status).to.equal(200);
       expect(res.body).to.be.an("object");
     });
 
     it("should get all incompleted goals", async () => {
-      const res = await request(app).get("/api/goals/incompleted");
+      const res = await request(app).get("/api/goals/status?q=incomplete");
       expect(res.status).to.equal(200);
       expect(res.body).to.be.an("object");
     });
   });
 
-  // *Passed
+  // ? Passed, test edge cases
   describe("POST /api/goals/", () => {
     it("should create a new goal", async () => {
       const newGoalPayload = {
@@ -54,8 +56,7 @@ describe("API CRUD operations", () => {
       expect(res.body).to.be.an("object");
     });
   });
-
-  // !Failing
+  //? Passed, test edge cases
   describe("PUT /api/goals/", () => {
     it("should update an existing goal by id", async () => {
       const updateGoalPayload = {
@@ -71,7 +72,6 @@ describe("API CRUD operations", () => {
         .expect(200)
         .expect("Content-Type", /json/);
     });
-    // !Fix: This tests fail
     it("should mark as complete an existing goal by id", async () => {
       const goalToComplete = {
         id: Math.floor(Math.random() * 1000),

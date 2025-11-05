@@ -117,5 +117,26 @@
     "start_date": "12/12/25",
     "end_date": "13/13/13",
     "completed": false
+  },
+  {
+    "id": 40,
+    "name": "Create Goal with Testing",
+    "start_date": "15/07/25",
+    "end_date": "25/11/25",
+    "completed": true
+  },
+  {
+    "id": 978,
+    "name": "Completed Goal",
+    "start_date": "12/12/25",
+    "end_date": "13/13/13",
+    "completed": true
+  },
+  {
+    "id": 248,
+    "name": "Incompleted Goal",
+    "start_date": "12/12/25",
+    "end_date": "13/13/13",
+    "completed": false
   }
 ]

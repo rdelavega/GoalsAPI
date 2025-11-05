@@ -31,8 +31,8 @@ La aplicacion utiliza los siguientos endpoints:
 
 - `/api/goals` ---> Obtener de todas las metas
 - `/api/goals/:id` ---> Obtener meta segun id
-- `/api/completed` ---> Obtener metas completadas
-- `/api/incompleted` ---> Obtener metas incompletas
+- `/api/goals/status?q=complete` ---> Obtener metas completas
+- `/api/goals/status?q=incomplete` ---> Obtener metas incompletas
 
 ### POST
 
