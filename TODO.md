@@ -5,7 +5,7 @@
 - ✅ Revisar todos los controllers y unificar el estilo de manejo de errores (usar `try/catch` en todos o callbacks de `fs` consistentes).
 - [ ] Revisar los nombres de variables y consistencia (ej. `incompleted` → `incomplete`).
 - ✅ Asegurarte de que **todas las rutas tengan sendResponse** con estructura consistente `{status, message, data}`.
-- [ ] Revisar validaciones de payloads (`req.body`) en **create** y **update**.
+- ✅ Revisar validaciones de payloads (`req.body`) en **create** y **update**.
 - ✅ Revisar que **las rutas literales se declaren antes de las dinámicas** (`/goals/completed` antes de `/goals/:id`).
 
 ---
@@ -15,7 +15,7 @@
 - [ ] Consolidar la lectura y escritura del JSON para evitar race conditions (leer, modificar, escribir correctamente).
 - [ ] Manejar errores de lectura/escritura de manera uniforme.
 - ✅ Revisar que **las operaciones POST no sobreescriban todo**, sino que **pusheen al array y escriban el nuevo array**.
-- [ ] Opcional: crear un helper `readJSON` y `writeJSON` para abstraer `fs.readFile` y `fs.writeFile`.
+- ✅ Opcional: crear un helper `readJSON` y `writeJSON` para abstraer `fs.readFile` y `fs.writeFile`.
 
 ---
 
@@ -23,7 +23,7 @@
 
 - [ ] Crear middleware para **validar payloads de POST y PUT** (evitar ids duplicados o datos incompletos).
 - [ ] Crear middleware global de errores si no existe (`errorHandler.js`).
-- [ ] Revisar middleware de **CORS** y probar que funciona en Postman y navegador.
+- ✅ Revisar middleware de **CORS** y probar que funciona en Postman y navegador.
 
 ---
 
@@ -37,7 +37,7 @@
 
 ### **5 Tests**
 
-- [ ] Escribir tests unitarios con **Mocha + Chai** para cada endpoint:
+- ✅ Escribir tests unitarios con **Mocha + Chai** para cada endpoint:
 
   - GET `/goals`
   - GET `/goals/:id`
@@ -60,8 +60,8 @@
 
 ### **7 Extra (opcional pero recomendado)**
 
-- [ ] Refactorizar para usar **promesas / async-await** con `fs.promises` en lugar de callbacks.
-- [ ] Considerar modularizar helpers de JSON en `/utils/jsonHandler.js`.
+- ✅ Refactorizar para usar **promesas / async-await** con `fs.promises` en lugar de callbacks.
+- ✅ Considerar modularizar helpers de JSON en `/utils/jsonHandler.js`.
 - [ ] Revisar performance si el JSON crece (leer/escribir todo el archivo puede ser lento).
 
 ---

@@ -2,7 +2,12 @@ import request from "supertest";
 import app from "../src/app.js";
 import { expect } from "chai";
 import { describe, it } from "mocha";
+import { readFile, writeFile } from "fs/promises";
+import writeJson from "../src/utils/writeJson.js";
+import { writeFileSync } from "fs";
 
+//Config
+const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
 // TODO pass all test suites
 describe("API CRUD operations", () => {
   // *Passed
@@ -61,25 +66,75 @@ describe("API CRUD operations", () => {
       };
 
       const res = await request(app)
-        .put("/api/goals/7")
+        .put("/api/goals/10")
         .send(updateGoalPayload)
         .expect(200)
         .expect("Content-Type", /json/);
     });
-    // !Fix: This tests erases all of goals.jsonr records
-    it.skip("should mark as complete an existing goal by id", async () => {
-      const res = await request(app).put("/api/goals/complete/6").expect(200);
+    // !Fix: This tests fail
+    it("should mark as complete an existing goal by id", async () => {
+      const goalToComplete = {
+        id: Math.floor(Math.random() * 1000),
+        name: "Completed Goal",
+        start_date: "12/12/25",
+        end_date: "13/13/13",
+        completed: false,
+      };
+
+      const content = await readFile(filePath, { encoding: "utf8" });
+      const goals = JSON.parse(content);
+      goals.push(goalToComplete);
+      const contentToWrite = JSON.stringify(goals, null, 2);
+      const write = await writeFile(filePath, contentToWrite, {
+        encoding: "utf8",
+      });
+      const res = await request(app)
+        .put(`/api/goals/complete/${goalToComplete.id}`)
+        .expect(200);
     });
 
-    it.skip("should mark as complete an existing goal by id", async () => {
-      const res = await request(app).put("/api/goals/incomplete/6").expect(200);
+    it("should mark as incomplete an existing goal by id", async () => {
+      const goalToIncomplete = {
+        id: Math.floor(Math.random() * 1000),
+        name: "Incompleted Goal",
+        start_date: "12/12/25",
+        end_date: "13/13/13",
+        completed: true,
+      };
+
+      const content = await readFile(filePath, { encoding: "utf8" });
+      const goals = JSON.parse(content);
+      goals.push(goalToIncomplete);
+      const contentToWrite = JSON.stringify(goals, null, 2);
+      const write = await writeFile(filePath, contentToWrite, {
+        encoding: "utf8",
+      });
+      const res = await request(app)
+        .put(`/api/goals/incomplete/${goalToIncomplete.id}`)
+        .expect(200);
     });
   });
 
-  // !Failing
+  // ? Passing, test edge cases
   describe("DELETE /api/goals/", () => {
     it("should delete an existing goal by ID", async () => {
-      const res = await request(app).delete("/api/goals/9").expect(200);
+      const goalToDelete = {
+        id: Math.floor(Math.random() * 1000),
+        name: "Deleted Goal",
+        start_date: "12/12/25",
+        end_date: "13/13/13",
+        completed: true,
+      };
+      const content = await readFile(filePath, { encoding: "utf8" });
+      const goals = JSON.parse(content);
+      goals.push(goalToDelete);
+      const contentToWrite = JSON.stringify(goals, null, 2);
+      const write = await writeFile(filePath, contentToWrite, {
+        encoding: "utf8",
+      });
+      const res = await request(app)
+        .delete(`/api/goals/${goalToDelete.id}`)
+        .expect(200);
     });
   });
 });

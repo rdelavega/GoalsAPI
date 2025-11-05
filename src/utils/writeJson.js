@@ -5,7 +5,7 @@ async function writeJson(filePath, goals, res) {
   try {
     const content = JSON.stringify(goals, null, 2);
     await writeFile(filePath, content, { encoding: "utf8" });
-    sendResponse(res, 201, "Write Success", "Goal saved");
+    return content;
   } catch (err) {
     sendResponse(res, 500, "writeJson Error", err);
   }

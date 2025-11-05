@@ -1,13 +1,17 @@
 import sendResponse from "./sendResponse.js";
 
 const findIndexById = (id, goals, res) => {
-  const goalIndex = goals.findIndex((goal) => goal.id === parseInt(id));
+  try {
+    const goalIndex = goals.findIndex((goal) => goal.id === parseInt(id));
 
-  if (goalIndex === -1) {
-    return sendResponse(res, 404, "Error", "Goal not found");
+    if (goalIndex === -1) {
+      return sendResponse(res, 404, "Error", "Goal not found");
+    }
+
+    return goalIndex;
+  } catch (err) {
+    sendResponse(res, 500, "findIndexById Error", JSON.parse(err));
   }
-
-  return goalIndex;
 };
 
 export default findIndexById;

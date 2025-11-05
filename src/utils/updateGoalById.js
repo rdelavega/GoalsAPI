@@ -1,9 +1,14 @@
 import findIndexById from "./findIndexById.js";
+import sendResponse from "./sendResponse.js";
 
-const updateGoalById = (id, goals, res) => {
-  const goalToUpdateIndex = findIndexById(id, goals, res);
-  goals[goalToUpdateIndex] = { id: parseInt(id), ...updatedGoalData };
-  sendResponse(res, 200, `Goal with ${id} updated`, goals[goalToUpdateIndex]);
+const updateGoalById = async (id, goals, updatedGoalData, res) => {
+  try {
+    const goalToUpdateIndex = findIndexById(id, goals, res);
+    goals[goalToUpdateIndex] = { id: parseInt(id), ...updatedGoalData };
+    return goals;
+  } catch (err) {
+    console.log(`[updateGoalById]: Error ${err}`);
+  }
 };
 
 export default updateGoalById;

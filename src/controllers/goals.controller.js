@@ -7,9 +7,8 @@ import validateGoal from "../utils/validateGoal.js";
 import updateGoalById from "../utils/updateGoalById.js";
 import findIndexById from "../utils/findIndexById.js";
 //Config
-const filePath = "/home/rdlvg/Ejercicios/GoalsAPI/src/data/goals.json";
+const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
 
-// TODO fix PUT and DELETE functionality
 async function getGoals(req, res) {
   try {
     const goals = await readJson(filePath, res);
@@ -31,7 +30,7 @@ async function getGoalById(req, res) {
   }
 }
 
-// TODO: Refactor routes with query; True = Completed, False = Incompleted
+// TODO: Refactor routes with query ?status=complete/incomplete instead of True = Completed, False = Incompleted
 async function getCompletedGoals(req, res) {
   try {
     const goals = await readJson(filePath, res);
@@ -80,7 +79,6 @@ async function createGoal(req, res) {
 
   try {
     const goals = await readJson(filePath, res);
-    console.log(`Goals read: ${goals.length}`);
     const existingGoal = findById(goals, goalData.id, res);
     if (existingGoal) {
       return sendResponse(
@@ -90,24 +88,23 @@ async function createGoal(req, res) {
         "Theres an already existing goal with that id"
       );
     }
-    console.log("Running push to goals.json array");
 
     goals.push(goalData);
-    console.log(`Goals to push: ${goals}`);
     const result = await writeJson(filePath, goals, res);
+    sendResponse(res, 201, "Success", "Created Goal");
   } catch (err) {
-    console.log(err);
     sendResponse(res, 500, "Error Creating Goal", err);
   }
 }
 
-// TODO validate from query instead of 2 routes
+// TODO validate from query instead of 2 routes for completing or incompleting
 async function completeGoalById(req, res) {
   const { id } = req.params;
 
   try {
-    const goals = readJson(filePath, res);
-    validateGoal(id, goals, true, res);
+    const goals = await readJson(filePath, res);
+    const validatedGoals = await validateGoal(id, goals, true, res);
+    const result = await writeJson(filePath, goals, res);
   } catch (err) {
     sendResponse(res, 500, "Error completing goal", err);
   }
@@ -117,11 +114,10 @@ async function incompleteGoalById(req, res) {
   const { id } = req.params;
   try {
     const goals = await readJson(filePath, res);
-    validateGoal(id, goals, false, res);
-
-    await writeJson(filePath, goals, res);
+    const invalidatedGoals = await validateGoal(id, goals, false, res);
+    const result = await writeJson(filePath, goals, res);
   } catch (err) {
-    sendResponse(res, 500, "Error validating goal", err);
+    sendResponse(res, 500, "Error invalidating goal", err);
   }
 }
 
@@ -136,12 +132,27 @@ async function updateGoal(req, res) {
   if (updatedGoalData.id) {
     return sendResponse(res, 409, "Error", "You can't update the goal ID.");
   }
+
+  if (
+    !updatedGoalData.name |
+    !updatedGoalData.start_date |
+    !updatedGoalData.end_date |
+    !updatedGoalData.completed
+  ) {
+    return sendResponse(
+      res,
+      409,
+      "Error",
+      "There is no data for updating goal"
+    );
+  }
   try {
-    const goals = await readJson(filterGoals, res);
+    const goals = await readJson(filePath, res);
 
-    updateGoalById(id, goals, res);
+    const updatedGoals = await updateGoalById(id, goals, updatedGoalData, res);
 
-    await writeJson(filePath, goals, res);
+    const result = await writeJson(filePath, updatedGoals, res);
+    sendResponse(res, 200, "Success", "Updated Goal");
   } catch (err) {
     sendResponse(res, 500, "Error updating goal", err);
   }
