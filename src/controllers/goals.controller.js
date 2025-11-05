@@ -7,9 +7,9 @@ import validateGoal from "../utils/validateGoal.js";
 import updateGoalById from "../utils/updateGoalById.js";
 import findIndexById from "../utils/findIndexById.js";
 //Config
-const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
+const filePath = "/home/rdlvg/Ejercicios/GoalsAPI/src/data/goals.json";
 
-// TODO check POST, PUT and DELETE functionality
+// TODO fix PUT and DELETE functionality
 async function getGoals(req, res) {
   try {
     const goals = await readJson(filePath, res);
@@ -80,7 +80,8 @@ async function createGoal(req, res) {
 
   try {
     const goals = await readJson(filePath, res);
-    const existingGoal = findById(goals, id, res);
+    console.log(`Goals read: ${goals.length}`);
+    const existingGoal = findById(goals, goalData.id, res);
     if (existingGoal) {
       return sendResponse(
         res,
@@ -89,10 +90,13 @@ async function createGoal(req, res) {
         "Theres an already existing goal with that id"
       );
     }
+    console.log("Running push to goals.json array");
 
     goals.push(goalData);
-    await writeJson(filePath, goals, res);
+    console.log(`Goals to push: ${goals}`);
+    const result = await writeJson(filePath, goals, res);
   } catch (err) {
+    console.log(err);
     sendResponse(res, 500, "Error Creating Goal", err);
   }
 }
@@ -104,8 +108,6 @@ async function completeGoalById(req, res) {
   try {
     const goals = readJson(filePath, res);
     validateGoal(id, goals, true, res);
-
-    await writeJson(filePath, goals, res);
   } catch (err) {
     sendResponse(res, 500, "Error completing goal", err);
   }

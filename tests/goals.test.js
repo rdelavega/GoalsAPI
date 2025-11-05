@@ -32,7 +32,7 @@ describe("API CRUD operations", () => {
     });
   });
 
-  // !Failing
+  // *Passed
   describe("POST /api/goals/", () => {
     it("should create a new goal", async () => {
       const newGoalPayload = {
