@@ -12,10 +12,10 @@ const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
 // TODO check consistencies on success and error messages, as in function names and params
 async function getGoals(req, res) {
   try {
-    const goals = await readJson(filePath, res);
-    sendResponse(res, 200, "Goals", goals);
-  } catch (parseErr) {
-    sendResponse(res, 500, "Error", parseErr);
+    const goals = await readJson(res, filePath);
+    sendResponse(res, 200, "Success", goals);
+  } catch (err) {
+    sendResponse(res, 500, "Error", JSON.parse(err));
   }
 }
 
@@ -23,11 +23,14 @@ async function getGoalById(req, res) {
   const { id } = req.params;
 
   try {
-    const goals = await readJson(filePath, res);
-    const goalToFind = findById(goals, id, res);
-    return sendResponse(res, 200, `Goal ${id}`, goalToFind);
+    const goals = await readJson(res, filePath);
+    const goalToFind = findById(res, goals, id);
+    if (!goalToFind) {
+      return sendResponse(res, 404, "Error", "Goal not found");
+    }
+    return sendResponse(res, 200, "Success", goalToFind);
   } catch (err) {
-    sendResponse(res, 500, "Error", err);
+    sendResponse(res, 500, "Error", JSON.parse(err));
   }
 }
 
@@ -35,11 +38,11 @@ async function getGoalsByStatus(req, res) {
   const searchStatus = req.query.q;
   const statusValue = searchStatus === "complete" ? true : false;
   try {
-    const goals = await readJson(filePath, res);
+    const goals = await readJson(res, filePath);
     const goalsByStatus = filterGoals(res, goals, statusValue);
-    sendResponse(res, 200, "Goals", goalsByStatus);
+    sendResponse(res, 200, "Success", goalsByStatus);
   } catch (err) {
-    sendResponse(res, 500, "Error", err);
+    sendResponse(res, 500, "Error", JSON.parse(err));
   }
 }
 
@@ -47,12 +50,11 @@ async function createGoal(req, res) {
   const goalData = req.body;
 
   if (!goalData) {
-    console.log("No payload wtf");
     return sendResponse(
       res,
       409,
       "Error",
-      "There is no payload for creating a goal"
+      "There is no payload for creating goal"
     );
   }
   if (
@@ -62,56 +64,41 @@ async function createGoal(req, res) {
     !goalData.end_date |
     (typeof goalData.completed !== "boolean")
   ) {
-    console.log("No sufficient data");
     return sendResponse(
       res,
       409,
       "Error",
-      "There is no data for creating goal"
+      "Missing required data for creating goal"
     );
   }
 
   try {
-    const goals = await readJson(filePath, res);
-    const existingGoal = findById(goals, goalData.id, res);
+    const goals = await readJson(res, filePath);
+    const existingGoal = findById(res, goals, goalData.id);
     if (existingGoal) {
-      console.log("Existing goal error");
       return sendResponse(
         res,
         409,
         "Error",
-        "Theres an already existing goal with that id"
+        "There's an already existing goal with that id"
       );
     }
 
     goals.push(goalData);
-    const result = await writeJson(filePath, goals, res);
+    const result = await writeJson(res, filePath, goals);
     sendResponse(res, 201, "Success", "Created Goal");
   } catch (err) {
-    sendResponse(res, 500, "Error Creating Goal", err);
+    sendResponse(res, 500, "Error", "Error creating Goal");
   }
 }
 
-// TODO Refactor: validate from query instead of 2 routes for completing or incompleting
-async function validateGoalById(req, res) {
-  const { id } = req.params;
-  const validateParam = req.query.q;
-  const validateValue = validateParam === "complete" ? true : false;
-  try {
-    const goals = await readJson(filePath, res);
-    const validateGoals = await validateGoal(res, id, goals, validateValue);
-    const result = await writeJson(filePath, goals, res);
-  } catch (err) {
-    sendResponse(res, 500, "Error", JSON.parse(err));
-  }
-}
-
+// !Fix Headers Error
 async function updateGoal(req, res) {
   const { id } = req.params;
   const updatedGoalData = req.body;
 
   if (!updatedGoalData) {
-    return sendResponse(res, 404, "Error", "There is no payload for update");
+    return sendResponse(res, 409, "Error", "There is no payload for update");
   }
 
   if (updatedGoalData.id) {
@@ -128,18 +115,32 @@ async function updateGoal(req, res) {
       res,
       409,
       "Error",
-      "There is no data for updating goal"
+      "Missing required data for updating goal"
     );
   }
   try {
-    const goals = await readJson(filePath, res);
+    const goals = await readJson(res, filePath);
 
-    const updatedGoals = await updateGoalById(id, goals, updatedGoalData, res);
+    const updatedGoals = await updateGoalById(res, id, goals, updatedGoalData);
 
-    const result = await writeJson(filePath, updatedGoals, res);
+    const result = await writeJson(res, filePath, updatedGoals);
     sendResponse(res, 200, "Success", "Updated Goal");
   } catch (err) {
-    sendResponse(res, 500, "Error updating goal", err);
+    sendResponse(res, 500, "Error", "Update Goal Error");
+  }
+}
+
+async function validateGoalById(req, res) {
+  const { id } = req.params;
+  const validateParam = req.query.q;
+  const validateValue = validateParam === "complete" ? true : false;
+  try {
+    const goals = await readJson(res, filePath);
+    const validateGoals = await validateGoal(res, id, goals, validateValue);
+    const result = await writeJson(res, filePath, goals);
+    sendResponse(res, 200, "Success", "Completeness status has been changed");
+  } catch (err) {
+    sendResponse(res, 500, "Error", "Update Goal Error");
   }
 }
 
@@ -147,21 +148,21 @@ async function deleteGoal(req, res) {
   const { id } = req.params;
 
   try {
-    const goals = await readJson(filePath, res);
-    const goalToDeleteIndex = findIndexById(id, goals, res);
+    const goals = await readJson(res, filePath);
+    const goalToDeleteIndex = findIndexById(res, id, goals);
 
     goals.splice(goalToDeleteIndex, 1);
 
-    await writeJson(filePath, goals, res);
+    await writeJson(res, filePath, goals);
 
     sendResponse(
       res,
       200,
-      `Goal with ID ${id} deleted. Goals remaining: ${goals.length}`,
-      goals
+      "Success",
+      `Goal with ID ${id} deleted. Goals remaining: ${goals.length}`
     );
   } catch (err) {
-    sendResponse(res, 500, "Error updating goal", err);
+    sendResponse(res, 500, "Error", JSON.parse(err));
   }
 }
 

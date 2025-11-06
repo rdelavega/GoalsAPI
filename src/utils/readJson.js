@@ -1,7 +1,7 @@
 import { readFile } from "fs/promises";
 import sendResponse from "./sendResponse.js";
 
-async function readJson(filePath, res) {
+async function readJson(res, filePath) {
   try {
     const content = await readFile(filePath, { encoding: "utf8" });
     if (!content) {
@@ -10,7 +10,7 @@ async function readJson(filePath, res) {
     const goals = JSON.parse(content);
     return goals;
   } catch (err) {
-    sendResponse(res, 500, "readJson error", err);
+    sendResponse(res, 500, "Error", JSON.parse(err));
   }
 }
 

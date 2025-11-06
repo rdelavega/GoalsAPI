@@ -10,7 +10,11 @@ const validateGoal = async (res, id, goals, param) => {
       return sendResponse(res, 409, "Error", "Param must be True or False");
     }
 
-    const goalToValidateIndex = findIndexById(id, goals, res);
+    const goalToValidateIndex = findIndexById(res, id, goals);
+
+    if (!goalToValidateIndex) {
+      return sendResponse(res, 404, "Error", "Goal not found");
+    }
 
     goals[goalToValidateIndex].completed = param;
     let message = param === true ? "completed" : "incompleted";
@@ -25,7 +29,7 @@ const validateGoal = async (res, id, goals, param) => {
 
     return goals;
   } catch (err) {
-    console.log(`[validateGoal]: Error, ${err}`);
+    sendResponse(res, 500, "Error", "Vallidate Goal Error");
   }
 };
 

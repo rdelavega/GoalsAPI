@@ -19,7 +19,7 @@ describe("API CRUD operations", () => {
     });
 
     it("should get a goal by id", async () => {
-      const res = await request(app).get("/api/goals/1");
+      const res = await request(app).get("/api/goals/2");
       expect(res.status).to.equal(200);
       expect(res.body).to.be.an("object");
     });
@@ -35,9 +35,14 @@ describe("API CRUD operations", () => {
       expect(res.status).to.equal(200);
       expect(res.body).to.be.an("object");
     });
+
+    it("should fail getting a non existing goal", async () => {
+      const res = await request(app).get("/api/goals/0");
+      expect(res.status).to.equal(404);
+    });
   });
 
-  // ? Passed, test edge cases
+  // * Passed with edge cases
   describe("POST /api/goals/", () => {
     it("should create a new goal", async () => {
       const newGoal = await generateGoalPayload(false);
@@ -48,7 +53,7 @@ describe("API CRUD operations", () => {
       expect(res.body).to.be.an("object");
     });
 
-    // !Edge cases
+    // Edge cases
 
     it("should fail attempting to create a goal with same id as others", async () => {
       const existingGoalId = await getExistingGoalById(2);
@@ -58,7 +63,22 @@ describe("API CRUD operations", () => {
 
       expect(res.status).to.equal(409);
     });
+
+    it("should fail attempting to create a goal with required data", async () => {
+      const newGoal = await generateGoalPayload("");
+
+      const res = await request(app).post("/api/goals").send(newGoal);
+
+      expect(res.status).to.equal(409);
+    });
+
+    it("should fail attempting to create a goal without a payload", async () => {
+      const res = await request(app).post("/api/goals").send();
+
+      expect(res.status).to.equal(409);
+    });
   });
+
   //? Passed, test edge cases
   describe("PUT /api/goals/", () => {
     it("should update an existing goal by id", async () => {

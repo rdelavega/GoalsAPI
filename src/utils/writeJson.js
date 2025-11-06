@@ -1,13 +1,13 @@
 import { writeFile } from "fs/promises";
 import sendResponse from "./sendResponse.js";
 
-async function writeJson(filePath, goals, res) {
+async function writeJson(res, filePath, goals) {
   try {
     const content = JSON.stringify(goals, null, 2);
     await writeFile(filePath, content, { encoding: "utf8" });
     return content;
   } catch (err) {
-    sendResponse(res, 500, "writeJson Error", err);
+    sendResponse(res, 500, "Error", JSON.parse(err));
   }
 }
 

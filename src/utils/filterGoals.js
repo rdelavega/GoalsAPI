@@ -7,7 +7,7 @@ const filterGoals = (res, goals, param) => {
   const filteredGoals = goals.filter((goal) => goal.completed === param);
 
   if (filteredGoals.length === 0) {
-    return sendResponse(res, 404, "Error filtering Goals");
+    return sendResponse(res, 404, "Error", "Goals not found");
   }
 
   return filteredGoals;
