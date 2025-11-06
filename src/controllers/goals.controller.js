@@ -47,6 +47,7 @@ async function createGoal(req, res) {
   const goalData = req.body;
 
   if (!goalData) {
+    console.log("No payload wtf");
     return sendResponse(
       res,
       409,
@@ -59,8 +60,9 @@ async function createGoal(req, res) {
     !goalData.name |
     !goalData.start_date |
     !goalData.end_date |
-    !goalData.completed
+    (typeof goalData.completed !== "boolean")
   ) {
+    console.log("No sufficient data");
     return sendResponse(
       res,
       409,
@@ -73,6 +75,7 @@ async function createGoal(req, res) {
     const goals = await readJson(filePath, res);
     const existingGoal = findById(goals, goalData.id, res);
     if (existingGoal) {
+      console.log("Existing goal error");
       return sendResponse(
         res,
         409,
@@ -90,26 +93,16 @@ async function createGoal(req, res) {
 }
 
 // TODO Refactor: validate from query instead of 2 routes for completing or incompleting
-async function completeGoalById(req, res) {
+async function validateGoalById(req, res) {
   const { id } = req.params;
-
+  const validateParam = req.query.q;
+  const validateValue = validateParam === "complete" ? true : false;
   try {
     const goals = await readJson(filePath, res);
-    const validatedGoals = await validateGoal(id, goals, true, res);
+    const validateGoals = await validateGoal(res, id, goals, validateValue);
     const result = await writeJson(filePath, goals, res);
   } catch (err) {
-    sendResponse(res, 500, "Error completing goal", err);
-  }
-}
-
-async function incompleteGoalById(req, res) {
-  const { id } = req.params;
-  try {
-    const goals = await readJson(filePath, res);
-    const invalidatedGoals = await validateGoal(id, goals, false, res);
-    const result = await writeJson(filePath, goals, res);
-  } catch (err) {
-    sendResponse(res, 500, "Error invalidating goal", err);
+    sendResponse(res, 500, "Error", JSON.parse(err));
   }
 }
 
@@ -177,8 +170,7 @@ const goalsController = {
   getGoalById,
   getGoalsByStatus,
   createGoal,
-  completeGoalById,
-  incompleteGoalById,
+  validateGoalById,
   updateGoal,
   deleteGoal,
 };

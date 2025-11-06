@@ -3,16 +3,14 @@ import app from "../src/app.js";
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import { readFile, writeFile } from "fs/promises";
-import writeJson from "../src/utils/writeJson.js";
-import { writeFileSync } from "fs";
-
+import generateGoalPayload from "./helpers/generateGoalPayload.js";
+import generateGoalPayloadWithId from "./helpers/generateGoalPayloadWithId.js";
+import getExistingGoalById from "./helpers/getGoalById.js";
 //Config
 const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
 // TODO: pass all test suites
 describe("API CRUD operations", () => {
   // *Passed
-
-  // TODO: refactor test with new getGoalsByStatus route
   describe("GET /api/goals/", () => {
     it("should get all goals", async () => {
       const res = await request(app).get("/api/goals");
@@ -42,18 +40,23 @@ describe("API CRUD operations", () => {
   // ? Passed, test edge cases
   describe("POST /api/goals/", () => {
     it("should create a new goal", async () => {
-      const newGoalPayload = {
-        id: Math.floor(Math.random() * 100),
-        name: "Create Goal with Testing",
-        start_date: "15/07/25",
-        end_date: "25/11/25",
-        completed: true,
-      };
+      const newGoal = await generateGoalPayload(false);
 
-      const res = await request(app).post("/api/goals").send(newGoalPayload);
+      const res = await request(app).post("/api/goals").send(newGoal);
 
       expect(res.status).to.equal(201);
       expect(res.body).to.be.an("object");
+    });
+
+    // !Edge cases
+
+    it("should fail attempting to create a goal with same id as others", async () => {
+      const existingGoalId = await getExistingGoalById(2);
+
+      const newGoal = await generateGoalPayloadWithId(existingGoalId);
+      const res = await request(app).post("/api/goals").send(newGoal);
+
+      expect(res.status).to.equal(409);
     });
   });
   //? Passed, test edge cases
@@ -89,7 +92,7 @@ describe("API CRUD operations", () => {
         encoding: "utf8",
       });
       const res = await request(app)
-        .put(`/api/goals/complete/${goalToComplete.id}`)
+        .put(`/api/goals/${goalToComplete.id}/validate?q=complete`)
         .expect(200);
     });
 
@@ -110,7 +113,7 @@ describe("API CRUD operations", () => {
         encoding: "utf8",
       });
       const res = await request(app)
-        .put(`/api/goals/incomplete/${goalToIncomplete.id}`)
+        .put(`/api/goals/${goalToIncomplete.id}/validate?q=incomplete`)
         .expect(200);
     });
   });

@@ -11,11 +11,9 @@ router.get("/goals/:id", goalsController.getGoalById);
 
 router.post("/goals", goalsController.createGoal);
 
-router.put("/goals/complete/:id", goalsController.completeGoalById);
-
-router.put("/goals/incomplete/:id", goalsController.incompleteGoalById);
-
 router.put("/goals/:id", goalsController.updateGoal);
+
+router.put("/goals/:id/validate", goalsController.validateGoalById);
 
 router.delete("/goals/:id", goalsController.deleteGoal);
 

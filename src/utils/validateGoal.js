@@ -1,7 +1,7 @@
 import findIndexById from "./findIndexById.js";
 import sendResponse from "./sendResponse.js";
 
-const validateGoal = async (id, goals, param, res) => {
+const validateGoal = async (res, id, goals, param) => {
   try {
     if (typeof param !== "boolean") {
       console.log(
@@ -14,6 +14,8 @@ const validateGoal = async (id, goals, param, res) => {
 
     goals[goalToValidateIndex].completed = param;
     let message = param === true ? "completed" : "incompleted";
+
+    console.log(`Goal with id: ${id}, marked as ${param}`);
     sendResponse(
       res,
       200,
