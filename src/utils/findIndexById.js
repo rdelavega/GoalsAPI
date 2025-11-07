@@ -6,7 +6,7 @@ const findIndexById = (res, id, goals) => {
 
     return goalIndex;
   } catch (err) {
-    sendResponse(res, 500, "findIndexById Error", JSON.parse(err));
+    sendResponse(res, 500, "findIndexById Error", err.message);
   }
 };
 

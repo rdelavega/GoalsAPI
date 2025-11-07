@@ -3,12 +3,12 @@ import sendResponse from "./sendResponse.js";
 
 const validateGoal = async (res, id, goals, param) => {
   try {
+    console.log("Value of param in validateGoal: ", param);
     if (typeof param !== "boolean") {
-      console.log(
-        `[validateGoal]: Error, param is not boolean is ${typeof param}`
-      );
       return sendResponse(res, 409, "Error", "Param must be True or False");
     }
+
+    let message = param === true ? "completed" : "incompleted";
 
     const goalToValidateIndex = findIndexById(res, id, goals);
 
@@ -16,20 +16,21 @@ const validateGoal = async (res, id, goals, param) => {
       return sendResponse(res, 404, "Error", "Goal not found");
     }
 
-    goals[goalToValidateIndex].completed = param;
-    let message = param === true ? "completed" : "incompleted";
+    //! Broken
+    // if (goals[goalToValidateIndex].completed === param) {
+    //   return sendResponse(
+    //     res,
+    //     304,
+    //     "Not modified",
+    //     `Goal already in ${message} status`
+    //   );
+    // }
 
-    console.log(`Goal with id: ${id}, marked as ${param}`);
-    sendResponse(
-      res,
-      200,
-      `Goal marked as ${message}`,
-      goals[goalToValidateIndex]
-    );
+    goals[goalToValidateIndex].completed = param;
 
     return goals;
   } catch (err) {
-    sendResponse(res, 500, "Error", "Vallidate Goal Error");
+    sendResponse(res, 500, "Error", err.message);
   }
 };
 

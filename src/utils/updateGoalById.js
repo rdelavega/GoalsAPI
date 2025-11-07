@@ -1,13 +1,13 @@
 import findIndexById from "./findIndexById.js";
 import sendResponse from "./sendResponse.js";
 
-const updateGoalById = async (id, goals, updatedGoalData, res) => {
+const updateGoalById = async (res, id, goals, updatedGoalData) => {
   try {
-    const goalToUpdateIndex = findIndexById(id, goals, res);
+    const goalToUpdateIndex = findIndexById(res, id, goals);
     goals[goalToUpdateIndex] = { id: parseInt(id), ...updatedGoalData };
     return goals;
   } catch (err) {
-    console.log(`[updateGoalById]: Error ${err}`);
+    sendResponse(res, 500, "Error", err.message);
   }
 };
 

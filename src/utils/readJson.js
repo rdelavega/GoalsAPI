@@ -10,7 +10,7 @@ async function readJson(res, filePath) {
     const goals = JSON.parse(content);
     return goals;
   } catch (err) {
-    sendResponse(res, 500, "Error", JSON.parse(err));
+    sendResponse(res, 500, "Error", err.message);
   }
 }
 

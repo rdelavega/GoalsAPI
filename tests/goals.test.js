@@ -35,11 +35,6 @@ describe("API CRUD operations", () => {
       expect(res.status).to.equal(200);
       expect(res.body).to.be.an("object");
     });
-
-    it("should fail getting a non existing goal", async () => {
-      const res = await request(app).get("/api/goals/0");
-      expect(res.status).to.equal(404);
-    });
   });
 
   // * Passed with edge cases
@@ -52,34 +47,7 @@ describe("API CRUD operations", () => {
       expect(res.status).to.equal(201);
       expect(res.body).to.be.an("object");
     });
-
-    // Edge cases
-
-    it("should fail attempting to create a goal with same id as others", async () => {
-      const existingGoalId = await getExistingGoalById(2);
-
-      const newGoal = await generateGoalPayloadWithId(existingGoalId);
-      const res = await request(app).post("/api/goals").send(newGoal);
-
-      expect(res.status).to.equal(409);
-    });
-
-    it("should fail attempting to create a goal with required data", async () => {
-      const newGoal = await generateGoalPayload("");
-
-      const res = await request(app).post("/api/goals").send(newGoal);
-
-      expect(res.status).to.equal(409);
-    });
-
-    it("should fail attempting to create a goal without a payload", async () => {
-      const res = await request(app).post("/api/goals").send();
-
-      expect(res.status).to.equal(409);
-    });
   });
-
-  //? Passed, test edge cases
   describe("PUT /api/goals/", () => {
     it("should update an existing goal by id", async () => {
       const updateGoalPayload = {
@@ -95,6 +63,7 @@ describe("API CRUD operations", () => {
         .expect(200)
         .expect("Content-Type", /json/);
     });
+
     it("should mark as complete an existing goal by id", async () => {
       const goalToComplete = {
         id: Math.floor(Math.random() * 1000),
@@ -158,6 +127,72 @@ describe("API CRUD operations", () => {
       const res = await request(app)
         .delete(`/api/goals/${goalToDelete.id}`)
         .expect(200);
+    });
+  });
+
+  describe("API Edge Cases & Error Handling", () => {
+    describe("GET Edge Casa", () => {
+      it("should fail getting a non existing goal", async () => {
+        const res = await request(app).get("/api/goals/0");
+        expect(res.status).to.equal(404);
+      });
+    });
+    describe("POST Edge Cases", () => {
+      it("should fail attempting to create a goal with same ID as others", async () => {
+        const existingGoalId = await getExistingGoalById(2);
+
+        const newGoal = await generateGoalPayloadWithId(existingGoalId);
+        const res = await request(app).post("/api/goals").send(newGoal);
+
+        expect(res.status).to.equal(409);
+      });
+
+      it("should fail attempting to create a goal with ID as string", async () => {
+        const newGoal = await generateGoalPayloadWithId("23");
+        const res = await request(app)
+          .post("/api/goals")
+          .send(newGoal)
+          .expect(409);
+      });
+
+      it("should fail attempting to create a goal with required data", async () => {
+        const newGoal = await generateGoalPayload("");
+
+        const res = await request(app).post("/api/goals").send(newGoal);
+
+        expect(res.status).to.equal(409);
+      });
+
+      it("should fail attempting to create a goal without a payload", async () => {
+        const res = await request(app).post("/api/goals").send();
+
+        expect(res.status).to.equal(409);
+      });
+    });
+
+    describe("PUT Edge Cases", () => {
+      it("should fail to update a goal with missing data", async () => {
+        const updateGoalIncompletePayload = {
+          start_date: "15/07/25",
+          end_date: "25/11/25",
+          completed: true,
+        };
+
+        const res = await request(app)
+          .put("/api/goals/10")
+          .send(updateGoalIncompletePayload);
+
+        expect(res.status).to.equal(409);
+      });
+
+      it("should fail updating a goal id", async () => {
+        const newGoalUpdatePaylaod = await generateGoalPayload(true);
+
+        const res = await request(app)
+          .put("/api/goals/10")
+          .send(newGoalUpdatePaylaod)
+          .expect(409);
+      });
     });
   });
 });

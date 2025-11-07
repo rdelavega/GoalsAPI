@@ -15,7 +15,7 @@ async function getGoals(req, res) {
     const goals = await readJson(res, filePath);
     sendResponse(res, 200, "Success", goals);
   } catch (err) {
-    sendResponse(res, 500, "Error", JSON.parse(err));
+    sendResponse(res, 500, "Error", err.message);
   }
 }
 
@@ -30,7 +30,7 @@ async function getGoalById(req, res) {
     }
     return sendResponse(res, 200, "Success", goalToFind);
   } catch (err) {
-    sendResponse(res, 500, "Error", JSON.parse(err));
+    sendResponse(res, 500, "Error", err.message);
   }
 }
 
@@ -42,35 +42,12 @@ async function getGoalsByStatus(req, res) {
     const goalsByStatus = filterGoals(res, goals, statusValue);
     sendResponse(res, 200, "Success", goalsByStatus);
   } catch (err) {
-    sendResponse(res, 500, "Error", JSON.parse(err));
+    sendResponse(res, 500, "Error", err.message);
   }
 }
 
 async function createGoal(req, res) {
   const goalData = req.body;
-
-  if (!goalData) {
-    return sendResponse(
-      res,
-      409,
-      "Error",
-      "There is no payload for creating goal"
-    );
-  }
-  if (
-    !goalData.id |
-    !goalData.name |
-    !goalData.start_date |
-    !goalData.end_date |
-    (typeof goalData.completed !== "boolean")
-  ) {
-    return sendResponse(
-      res,
-      409,
-      "Error",
-      "Missing required data for creating goal"
-    );
-  }
 
   try {
     const goals = await readJson(res, filePath);
@@ -88,51 +65,30 @@ async function createGoal(req, res) {
     const result = await writeJson(res, filePath, goals);
     sendResponse(res, 201, "Success", "Created Goal");
   } catch (err) {
-    sendResponse(res, 500, "Error", "Error creating Goal");
+    sendResponse(res, 500, "Error", err.message);
   }
 }
 
-// !Fix Headers Error
 async function updateGoal(req, res) {
   const { id } = req.params;
   const updatedGoalData = req.body;
 
-  if (!updatedGoalData) {
-    return sendResponse(res, 409, "Error", "There is no payload for update");
-  }
-
-  if (updatedGoalData.id) {
-    return sendResponse(res, 409, "Error", "You can't update the goal ID.");
-  }
-
-  if (
-    !updatedGoalData.name |
-    !updatedGoalData.start_date |
-    !updatedGoalData.end_date |
-    !updatedGoalData.completed
-  ) {
-    return sendResponse(
-      res,
-      409,
-      "Error",
-      "Missing required data for updating goal"
-    );
-  }
   try {
     const goals = await readJson(res, filePath);
 
-    const updatedGoals = await updateGoalById(res, id, goals, updatedGoalData);
+    const updatedGoal = await updateGoalById(res, id, goals, updatedGoalData);
 
-    const result = await writeJson(res, filePath, updatedGoals);
-    sendResponse(res, 200, "Success", "Updated Goal");
+    const result = await writeJson(res, filePath, updatedGoal);
+    sendResponse(res, 200, "Success", `Updated Goal with ID ${id}`);
   } catch (err) {
-    sendResponse(res, 500, "Error", "Update Goal Error");
+    sendResponse(res, 500, "Error", err.message);
   }
 }
 
 async function validateGoalById(req, res) {
   const { id } = req.params;
   const validateParam = req.query.q;
+  console.log(validateParam);
   const validateValue = validateParam === "complete" ? true : false;
   try {
     const goals = await readJson(res, filePath);
@@ -140,7 +96,7 @@ async function validateGoalById(req, res) {
     const result = await writeJson(res, filePath, goals);
     sendResponse(res, 200, "Success", "Completeness status has been changed");
   } catch (err) {
-    sendResponse(res, 500, "Error", "Update Goal Error");
+    sendResponse(res, 500, "Error", err.message);
   }
 }
 
@@ -162,7 +118,7 @@ async function deleteGoal(req, res) {
       `Goal with ID ${id} deleted. Goals remaining: ${goals.length}`
     );
   } catch (err) {
-    sendResponse(res, 500, "Error", JSON.parse(err));
+    sendResponse(res, 500, "Error", err.message);
   }
 }
 

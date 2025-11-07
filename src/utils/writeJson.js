@@ -7,7 +7,7 @@ async function writeJson(res, filePath, goals) {
     await writeFile(filePath, content, { encoding: "utf8" });
     return content;
   } catch (err) {
-    sendResponse(res, 500, "Error", JSON.parse(err));
+    sendResponse(res, 500, "Error", err.message);
   }
 }
 
