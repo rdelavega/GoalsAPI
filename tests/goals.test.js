@@ -62,6 +62,8 @@ describe("API CRUD operations", () => {
         .send(updateGoalPayload)
         .expect(200)
         .expect("Content-Type", /json/);
+
+      console.log(res.body);
     });
 
     it("should mark as complete an existing goal by id", async () => {

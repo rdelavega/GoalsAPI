@@ -31,7 +31,7 @@
 
 - ✅ Permitir filtros por query: `/goals?status=completed` para no depender solo de rutas fijas.
 - ✅ Revisar respuesta de **updateGoal** y **deleteGoal**: devolver datos actualizados/array final.
-- [ ] Revisar consistencia de códigos HTTP (200, 201, 404, 409, 500).
+- ✅ Revisar consistencia de códigos HTTP (200, 201, 404, 409, 500).
 
 ---
 
@@ -46,7 +46,7 @@
   - DELETE `/goals/:id`
   - Validaciones `/goals/validate/:id` y `/goals/invalidate/:id`
 
-- [ ] Probar **casos límite**: id que no existe, payload vacío, id duplicado, archivo JSON corrupto.
+- ✅ Probar **casos límite**: id que no existe, payload vacío, id duplicado, archivo JSON corrupto.
 
 ---
 

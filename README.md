@@ -37,8 +37,8 @@ La aplicacion utiliza los siguientos endpoints:
 ### POST
 
 - `/api/goals` ---> Crear una meta (id, name, start_date, end_date, completed)
-- `/api/goals/validate/:id` ---> Marcar meta como completa
-- `/api/goals/invalidate/:id` ---> Marcar meta como incompleta
+- `/api/goals/:id/validate?q=complete` ---> Marcar meta como completa
+- `/api/goals/:id/validate?q=incomplete` ---> Marcar meta como incompleta
 
 ### PUT
 
@@ -93,6 +93,65 @@ La aplicacion utiliza los siguientos endpoints:
   }
   ```
 
+## POST:
+
+- `/api/goals`
+
+### Ejemplo de cuerpo de la peticion
+
+```json
+{
+  "id": "number",
+  "name": "string",
+  "start_date": "date",
+  "end_date": "date",
+  "completed": "boolean"
+}
+```
+
+### Respuesta
+
+```json
+{ "status": 201, "message": "Success", "data": "Created Goal" }
+```
+
+## PUT:
+
+- `/api/goals/:id`
+
+### Ejemplo de cuerpo de la peticion
+
+```json
+{
+  "name": "string",
+  "start_date": "date",
+  "end_date": "date",
+  "completed": "boolean"
+}
+```
+
+### Respuesta
+
+```json
+{ "status": 200, "message": "Success", "data": "Updated Goal with ID :id" }
+```
+
+## Delete
+
+.
+
+- `api/goals/:id`
+
+### Respuesta
+
+```json
+{
+  "status": 200,
+  "message": "Success",
+  "data": "Goal with ID ${id} deleted. Goals remaining: ${goals.length}"
+}
+```
+
 # Instalacion del proyecto
 
 ### Clonar repositorio
@@ -113,11 +172,21 @@ cd GoalsAPI
 npm install
 ```
 
+### Agregar direccion de archivo json los siguientes archivos:
+
+- `src/controllers/goals.controller.js`
+- `src/tests/goals.test.js`
+
 ### Correr servidor
 
 ```console
-cd src
-node app.js
+npm run dev
+```
+
+### Correr tests
+
+```console
+npm test
 ```
 
 # Futuras mejoras
@@ -126,3 +195,4 @@ node app.js
 - Validaciones con middleware
 - Testeo con Mocha + Chai
 - Dockerización del entorno
+- Agregar base de datos real
