@@ -9,18 +9,20 @@ const router = express.Router();
 router.use(logger);
 router.use(validateRoute);
 
+router.get("/goals", goalsController.getGoalsPaginated);
+
+router.get("/goals", goalsController.getGoalsByStatus);
+
 router.get("/goals", goalsController.getGoals);
 
-router.get("/goals/status", goalsController.getGoalsByStatus);
-
-router.get("/goals/:id", goalsController.getGoalById);
+router.get("/goals/find", goalsController.getGoalByName);
 
 router.post("/goals", goalsController.createGoal);
 
-router.put("/goals/:id/validate", goalsController.validateGoalById);
+router.put("/goals/:name/validate", goalsController.validateGoalByName);
 
-router.put("/goals/:id", validatePutRoute, goalsController.updateGoal);
+router.put("/goals/:name", validatePutRoute, goalsController.updateGoalByName);
 
-router.delete("/goals/:id", goalsController.deleteGoal);
+router.delete("/goals/:name", goalsController.deleteGoal);
 
 export default router;

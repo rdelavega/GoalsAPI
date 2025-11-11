@@ -6,6 +6,7 @@ import { readFile, writeFile } from "fs/promises";
 import generateGoalPayload from "./helpers/generateGoalPayload.js";
 import generateGoalPayloadWithId from "./helpers/generateGoalPayloadWithId.js";
 import getExistingGoalById from "./helpers/getGoalById.js";
+import { v4 as uuidv4 } from "uuid";
 //Config
 const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
 // TODO: pass all test suites
@@ -18,20 +19,26 @@ describe("API CRUD operations", () => {
       expect(res.body).to.be.an("object");
     });
 
-    it("should get a goal by id", async () => {
-      const res = await request(app).get("/api/goals/2");
+    it("should get goals by page and limit", async () => {
+      const res = await request(app).get("/api/goals?page=1&limit=10");
+      expect(res.status).to.equal(200);
+      expect(res.body).to.be.an("object");
+    });
+
+    it("should find a goal by name", async () => {
+      const res = await request(app).get("/api/goals/find?name=Random%20Goal");
       expect(res.status).to.equal(200);
       expect(res.body).to.be.an("object");
     });
 
     it("should get all completed goals", async () => {
-      const res = await request(app).get("/api/goals/status?q=complete");
+      const res = await request(app).get("/api/goals?completed=true");
       expect(res.status).to.equal(200);
       expect(res.body).to.be.an("object");
     });
 
     it("should get all incompleted goals", async () => {
-      const res = await request(app).get("/api/goals/status?q=incomplete");
+      const res = await request(app).get("/api/goals?completed=false");
       expect(res.status).to.equal(200);
       expect(res.body).to.be.an("object");
     });
@@ -58,7 +65,7 @@ describe("API CRUD operations", () => {
       };
 
       const res = await request(app)
-        .put("/api/goals/10")
+        .put(`/api/goals/${updateGoalPayload.name}`)
         .send(updateGoalPayload)
         .expect(200)
         .expect("Content-Type", /json/);
@@ -68,7 +75,6 @@ describe("API CRUD operations", () => {
 
     it("should mark as complete an existing goal by id", async () => {
       const goalToComplete = {
-        id: Math.floor(Math.random() * 1000),
         name: "Completed Goal",
         start_date: "12/12/25",
         end_date: "13/13/13",
@@ -83,13 +89,12 @@ describe("API CRUD operations", () => {
         encoding: "utf8",
       });
       const res = await request(app)
-        .put(`/api/goals/${goalToComplete.id}/validate?q=complete`)
+        .put(`/api/goals/${goalToComplete.name}/validate?q=complete`)
         .expect(200);
     });
 
     it("should mark as incomplete an existing goal by id", async () => {
       const goalToIncomplete = {
-        id: Math.floor(Math.random() * 1000),
         name: "Incompleted Goal",
         start_date: "12/12/25",
         end_date: "13/13/13",
@@ -104,7 +109,7 @@ describe("API CRUD operations", () => {
         encoding: "utf8",
       });
       const res = await request(app)
-        .put(`/api/goals/${goalToIncomplete.id}/validate?q=incomplete`)
+        .put(`/api/goals/${goalToIncomplete.name}/validate?q=incomplete`)
         .expect(200);
     });
   });
@@ -113,7 +118,7 @@ describe("API CRUD operations", () => {
   describe("DELETE /api/goals/", () => {
     it("should delete an existing goal by ID", async () => {
       const goalToDelete = {
-        id: Math.floor(Math.random() * 1000),
+        id: uuidv4(),
         name: "Deleted Goal",
         start_date: "12/12/25",
         end_date: "13/13/13",
@@ -127,36 +132,19 @@ describe("API CRUD operations", () => {
         encoding: "utf8",
       });
       const res = await request(app)
-        .delete(`/api/goals/${goalToDelete.id}`)
-        .expect(200);
+        .delete(`/api/goals/${goalToDelete.name}`)
+        .expect(204);
     });
   });
 
   describe("API Edge Cases & Error Handling", () => {
-    describe("GET Edge Casa", () => {
+    describe("GET Edge Cases", () => {
       it("should fail getting a non existing goal", async () => {
         const res = await request(app).get("/api/goals/0");
         expect(res.status).to.equal(404);
       });
     });
     describe("POST Edge Cases", () => {
-      it("should fail attempting to create a goal with same ID as others", async () => {
-        const existingGoalId = await getExistingGoalById(2);
-
-        const newGoal = await generateGoalPayloadWithId(existingGoalId);
-        const res = await request(app).post("/api/goals").send(newGoal);
-
-        expect(res.status).to.equal(409);
-      });
-
-      it("should fail attempting to create a goal with ID as string", async () => {
-        const newGoal = await generateGoalPayloadWithId("23");
-        const res = await request(app)
-          .post("/api/goals")
-          .send(newGoal)
-          .expect(409);
-      });
-
       it("should fail attempting to create a goal with required data", async () => {
         const newGoal = await generateGoalPayload("");
 

@@ -20,6 +20,19 @@ export default function validatePutRoute(req, res, next) {
     );
   }
 
+  if (
+    req.method === "PUT" &&
+    !req.body.start_date instanceof Date &&
+    !req.body.end_date instanceof Date
+  ) {
+    return sendResponse(
+      res,
+      409,
+      "Error",
+      "Start and End date must be of type Date"
+    );
+  }
+
   console.log("Validation complete");
   next();
 }

@@ -1,3 +1,4 @@
+import { isDate } from "util/types";
 import sendResponse from "../utils/sendResponse.js";
 
 export default function validateRoute(req, res, next) {
@@ -11,14 +12,23 @@ export default function validateRoute(req, res, next) {
     return sendResponse(res, 409, "Error", "There is no payload");
   }
 
-  if (req.method === "POST" && typeof req.body.id !== "number") {
-    return sendResponse(res, 409, "Error", "ID field must be a number");
+  if (
+    req.method === "POST" &&
+    !req.body.start_date instanceof Date &&
+    !req.body.end_date instanceof Date
+  ) {
+    console.error("not date");
+    return sendResponse(
+      res,
+      409,
+      "Error",
+      "Start and End date must be of type Date"
+    );
   }
 
   if (
     req.method === "POST" &&
-    !req.body.id |
-      !req.body.name |
+    !req.body.name |
       !req.body.start_date |
       !req.body.end_date |
       (typeof req.body.completed !== "boolean")

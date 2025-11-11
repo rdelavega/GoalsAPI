@@ -1,9 +1,9 @@
-import findIndexById from "./findIndexById.js";
+import findIndexByName from "./findIndexByName.js";
 import sendResponse from "./sendResponse.js";
 
-const updateGoalById = async (res, id, goals, updatedGoalData) => {
+const updateGoalByName = async (res, goals, name, updatedGoalData) => {
   try {
-    const goalToUpdateIndex = findIndexById(res, id, goals);
+    const goalToUpdateIndex = findIndexByName(res, goals, name);
     goals[goalToUpdateIndex] = { id: parseInt(id), ...updatedGoalData };
     return goals;
   } catch (err) {
@@ -11,4 +11,4 @@ const updateGoalById = async (res, id, goals, updatedGoalData) => {
   }
 };
 
-export default updateGoalById;
+export default updateGoalByName;
