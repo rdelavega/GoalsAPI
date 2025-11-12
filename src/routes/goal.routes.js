@@ -9,11 +9,11 @@ const router = express.Router();
 router.use(logger);
 router.use(validateRoute);
 
+router.get("/goals", goalsController.getGoals);
+
 router.get("/goals", goalsController.getGoalsPaginated);
 
 router.get("/goals", goalsController.getGoalsByStatus);
-
-router.get("/goals", goalsController.getGoals);
 
 router.get("/goals/find", goalsController.getGoalByName);
 

@@ -95,6 +95,7 @@ describe("API CRUD operations", () => {
 
     it("should mark as incomplete an existing goal by id", async () => {
       const goalToIncomplete = {
+        
         name: "Incompleted Goal",
         start_date: "12/12/25",
         end_date: "13/13/13",

@@ -87,7 +87,12 @@ async function getGoalsByStatus(req, res) {
 
 async function createGoal(req, res) {
   const goalData = req.body;
-  goalData.id = uuidv4();
+  if (!req.body.id) {
+    goalData.id = uuidv4();
+  }
+
+  goalData.start_date = new Date().toDateString();
+  goalData.end_date = new Date().toDateString();
 
   try {
     const goals = await readJson(res, filePath);

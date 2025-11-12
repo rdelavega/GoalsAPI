@@ -4,7 +4,7 @@ async function generateGoalPayload(completed) {
   const goalPayload = {
     id: uuidv4(),
     name: `Random Goal`,
-    start_date: new Date(Date.now()).toISOString(),
+    start_date: new Date(Date.now()).toDateString(),
     end_date: new Date("22 December 2025 14:48 UTC").toISOString(),
     completed: completed,
   };
