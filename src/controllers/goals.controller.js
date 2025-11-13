@@ -12,7 +12,7 @@ import findIndexByName from "../utils/findIndexByName.js";
 //Config
 const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
 
-// TODO check consistencies on success and error messages, as in function names and params
+// TODO with new UI refactor getting and deleting goals
 async function getGoals(req, res) {
   try {
     const goals = await readJson(res, filePath);
@@ -150,7 +150,7 @@ async function validateGoalByName(req, res) {
 // ! FIX
 
 async function deleteGoal(req, res) {
-  const { name } = req.params;
+  const { name } = req.query;
 
   try {
     const goals = await readJson(res, filePath);

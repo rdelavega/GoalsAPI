@@ -85,13 +85,34 @@
             type="checkbox"
             class="form-check-input"
             id="goal-completedCheck"
+            name="true"
           />
           <label class="form-check-label" for="goal-completedCheck"
             >Completed</label
           >
         </div>
         <button type="submit" class="btn btn-primary" id="create-goal-btn">
-          Submit
+          Create
+        </button>
+      </form>
+      <p id="log"></p>
+    </div>
+
+    <div class="container-md">
+      <h2>Delete Goal</h2>
+      <form id="create-goal-form">
+        <div class="form-group">
+          <label for="goal-name">Goal Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="deleted-goal-name"
+            aria-describedby="goalHelp"
+            placeholder="Get better grades..."
+          />
+        </div>
+        <button type="submit" class="btn btn-primary" id="create-goal-btn">
+          Delete
         </button>
       </form>
       <p id="log"></p>

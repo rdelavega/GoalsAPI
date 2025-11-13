@@ -33,7 +33,9 @@ async function createGoal(event) {
       name: document.getElementById("goal-name").value,
       start_date: document.getElementById("goal-startDate").value,
       end_date: document.getElementById("goal-endDate").value,
-      completed: document.getElementById("goal-completedCheck") ? true : false,
+      completed: document.getElementById("goal-completedCheck").checked
+        ? true
+        : false,
     };
     console.log(data);
     const response = await fetch(baseURL, {
@@ -44,6 +46,26 @@ async function createGoal(event) {
     return response.json();
   } catch (err) {
     alert("Error creating Goal");
+  }
+}
+
+// !Fix
+async function deleteGoal(event) {
+  try {
+    event.preventDefault();
+
+    const name = document.getElementById("deleted-goal-name").value;
+
+    let url = baseURL + name;
+    console.log(url);
+    const response = await fetch(`http://localhost:4001/api/goals/${name}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    console.log("Goal deleted succesfully");
+    return response.status === 204 ? null : response.json();
+  } catch (err) {
+    alert("Error deleting Goal");
   }
 }
 

@@ -5,5 +5,83 @@
     "end_date": "Wed Nov 12 2025",
     "completed": true,
     "id": "b984bcdf-fc88-4561-8526-8b5e23d0fdf6"
+  },
+  {
+    "name": "Update Frontend for better UI",
+    "start_date": "Thu Nov 13 2025",
+    "end_date": "Thu Nov 13 2025",
+    "completed": false,
+    "id": "9bfea235-373d-441c-a609-99d453d513f7"
+  },
+  {
+    "name": "Achieve incomplete creation from frontend",
+    "start_date": "Thu Nov 13 2025",
+    "end_date": "Thu Nov 13 2025",
+    "completed": true,
+    "id": "aecb8288-f8f0-47f8-abb8-57bfe46e6e8d"
+  },
+  {
+    "name": "Achieve incomplete creation from frontend",
+    "start_date": "Thu Nov 13 2025",
+    "end_date": "Thu Nov 13 2025",
+    "completed": false,
+    "id": "446a352e-5da5-4895-8453-0fe4104af8a5"
+  },
+  {
+    "id": "ccbce5c4-6d82-4453-878b-a95b1c9e7dab",
+    "name": "Random Goal",
+    "start_date": "Thu Nov 13 2025",
+    "end_date": "Thu Nov 13 2025",
+    "completed": false
+  },
+  {
+    "name": "Completed Goal",
+    "start_date": "12/12/25",
+    "end_date": "13/13/13",
+    "completed": true
+  },
+  {
+    "name": "Incompleted Goal",
+    "start_date": "12/12/25",
+    "end_date": "13/13/13",
+    "completed": false
+  },
+  {
+    "id": "caa06fb7-16e7-43f0-a43d-f45a412b7dc0",
+    "name": "Random Goal",
+    "start_date": "Thu Nov 13 2025",
+    "end_date": "Thu Nov 13 2025",
+    "completed": false
+  },
+  {
+    "name": "Completed Goal",
+    "start_date": "12/12/25",
+    "end_date": "13/13/13",
+    "completed": false
+  },
+  {
+    "name": "Incompleted Goal",
+    "start_date": "12/12/25",
+    "end_date": "13/13/13",
+    "completed": true
+  },
+  {
+    "id": "88cca536-1126-4719-8cf5-aa0f8c4cb437",
+    "name": "Random Goal",
+    "start_date": "Thu Nov 13 2025",
+    "end_date": "Thu Nov 13 2025",
+    "completed": false
+  },
+  {
+    "name": "Completed Goal",
+    "start_date": "12/12/25",
+    "end_date": "13/13/13",
+    "completed": false
+  },
+  {
+    "name": "Incompleted Goal",
+    "start_date": "12/12/25",
+    "end_date": "13/13/13",
+    "completed": true
   }
 ]
