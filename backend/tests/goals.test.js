@@ -8,7 +8,8 @@ import generateGoalPayloadWithId from "./helpers/generateGoalPayloadWithId.js";
 import getExistingGoalById from "./helpers/getGoalById.js";
 import { v4 as uuidv4 } from "uuid";
 //Config
-const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
+const filePath =
+  "/home/rdelavega/CodingPractice/GoalsAPI/backend/src/data/goals.json";
 // TODO: pass all test suites
 describe("API CRUD operations", () => {
   // *Passed
@@ -95,7 +96,6 @@ describe("API CRUD operations", () => {
 
     it("should mark as incomplete an existing goal by id", async () => {
       const goalToIncomplete = {
-        
         name: "Incompleted Goal",
         start_date: "12/12/25",
         end_date: "13/13/13",

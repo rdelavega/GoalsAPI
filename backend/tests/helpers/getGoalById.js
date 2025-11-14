@@ -1,6 +1,7 @@
 import { readFile } from "fs/promises";
 
-const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
+const filePath =
+  "/home/rdelavega/CodingPractice/GoalsAPI/backend/src/data/goals.json";
 
 async function getExistingGoalById(id) {
   const content = await readFile(filePath, { encoding: "utf8" });

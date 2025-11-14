@@ -11,7 +11,7 @@ router.use(validateRoute);
 
 router.get("/goals", goalsController.getGoals);
 
-router.get("/goals", goalsController.getGoalsPaginated);
+// router.get("/goals", goalsController.getGoalsPaginated);
 
 router.get("/goals", goalsController.getGoalsByStatus);
 

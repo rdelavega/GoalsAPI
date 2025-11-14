@@ -10,7 +10,8 @@ import findIndexById from "../utils/findIndexByName.js";
 import { v4 as uuidv4 } from "uuid";
 import findIndexByName from "../utils/findIndexByName.js";
 //Config
-const filePath = "/home/rdelavega/CodingPractice/GoalsAPI/src/data/goals.json";
+const filePath =
+  "/home/rdelavega/CodingPractice/GoalsAPI/backend/src/data/goals.json";
 
 // TODO with new UI refactor getting and deleting goals
 async function getGoals(req, res) {
