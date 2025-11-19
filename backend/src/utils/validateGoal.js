@@ -1,7 +1,7 @@
-import findIndexByName from "./findIndexByName.js";
+import findIndexById from "./findIndexById.js";
 import sendResponse from "./sendResponse.js";
 
-const validateGoal = async (res, name, goals, param) => {
+const validateGoal = async (res, id, goals, param) => {
   try {
     console.log("Value of param in validateGoal: ", param);
     if (typeof param !== "boolean") {
@@ -10,21 +10,11 @@ const validateGoal = async (res, name, goals, param) => {
 
     let message = param === true ? "completed" : "incompleted";
 
-    const goalToValidateIndex = findIndexByName(res, goals, name);
+    const goalToValidateIndex = findIndexById(res, goals, id);
 
     if (!goalToValidateIndex) {
       return sendResponse(res, 404, "Error", "Goal not found");
     }
-
-    //! Broken
-    // if (goals[goalToValidateIndex].completed === param) {
-    //   return sendResponse(
-    //     res,
-    //     304,
-    //     "Not modified",
-    //     `Goal already in ${message} status`
-    //   );
-    // }
 
     goals[goalToValidateIndex].completed = param;
 

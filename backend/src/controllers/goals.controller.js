@@ -5,10 +5,10 @@ import findById from "../utils/findById.js";
 import findByName from "../utils/findByName.js";
 import filterGoals from "../utils/filterGoals.js";
 import validateGoal from "../utils/validateGoal.js";
-import updateGoalById from "../utils/updateGoalByName.js";
-import findIndexById from "../utils/findIndexByName.js";
+import updateGoalById from "../utils/updateGoalById.js";
+import findIndexById from "../utils/findIndexById.js";
 import { v4 as uuidv4 } from "uuid";
-import findIndexByName from "../utils/findIndexByName.js";
+import findIndexByName from "../utils/findIndexById.js";
 //Config
 const filePath =
   "/home/rdelavega/CodingPractice/GoalsAPI/backend/src/data/goals.json";
@@ -58,13 +58,12 @@ async function getGoalsPaginated(req, res) {
   }
 }
 
-async function getGoalByName(req, res) {
-  const { name } = req.query;
-  console.log("Query: ", name);
+async function getGoalById(req, res) {
+  const { id } = req.params;
 
   try {
     const goals = await readJson(res, filePath);
-    const goalToFind = findByName(res, goals, name);
+    const goalToFind = findById(res, goals, id);
     if (!goalToFind) {
       return sendResponse(res, 404, "Error", "Goal not found");
     }
@@ -87,7 +86,7 @@ async function getGoalsByStatus(req, res) {
 }
 
 async function createGoal(req, res) {
-  const goalData = req.body;
+  const { goalData } = req.body;
   if (!req.body.id) {
     goalData.id = uuidv4();
   }
@@ -116,14 +115,14 @@ async function createGoal(req, res) {
 }
 
 // ! FIX
-async function updateGoalByName(req, res) {
-  const { name } = req.params;
+async function updateGoal(req, res) {
+  const { id } = req.params;
   const updatedGoalData = req.body;
 
   try {
     const goals = await readJson(res, filePath);
 
-    const updatedGoal = await updateGoalByName(res, id, goals, updatedGoalData);
+    const updatedGoal = await updateGoalById(res, goals, id, updatedGoalData);
 
     const result = await writeJson(res, filePath, updatedGoal);
     sendResponse(res, 200, "Success", `Updated Goal with ID ${id}`);
@@ -133,14 +132,14 @@ async function updateGoalByName(req, res) {
 }
 
 // ! FIX
-async function validateGoalByName(req, res) {
-  const { name } = req.params;
+async function validateGoalById(req, res) {
+  const { id } = req.params;
   const validateParam = req.query.q;
   console.log(validateParam);
   const validateValue = validateParam === "complete" ? true : false;
   try {
     const goals = await readJson(res, filePath);
-    const validateGoals = await validateGoal(res, name, goals, validateValue);
+    const validateGoals = await validateGoal(res, id, goals, validateValue);
     const result = await writeJson(res, filePath, goals);
     sendResponse(res, 200, "Success", "Completeness status has been changed");
   } catch (err) {
@@ -151,11 +150,11 @@ async function validateGoalByName(req, res) {
 // ! FIX
 
 async function deleteGoal(req, res) {
-  const { name } = req.query;
+  const { id } = req.params;
 
   try {
     const goals = await readJson(res, filePath);
-    const goalToDeleteIndex = findIndexByName(res, goals, name);
+    const goalToDeleteIndex = findIndexById(res, goals, id);
 
     goals.splice(goalToDeleteIndex, 1);
 
@@ -174,12 +173,12 @@ async function deleteGoal(req, res) {
 
 const goalsController = {
   getGoals,
-  getGoalByName,
+  getGoalById,
   getGoalsPaginated,
   getGoalsByStatus,
   createGoal,
-  validateGoalByName,
-  updateGoalByName,
+  validateGoalById,
+  updateGoal,
   deleteGoal,
 };
 

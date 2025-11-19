@@ -14,24 +14,10 @@ export default function validateRoute(req, res, next) {
 
   if (
     req.method === "POST" &&
-    !req.body.start_date instanceof Date &&
-    !req.body.end_date instanceof Date
-  ) {
-    console.error("not date");
-    return sendResponse(
-      res,
-      409,
-      "Error",
-      "Start and End date must be of type Date"
-    );
-  }
-
-  if (
-    req.method === "POST" &&
-    !req.body.name |
-      !req.body.start_date |
-      !req.body.end_date |
-      (typeof req.body.completed !== "boolean")
+    !req.body.goalData.name |
+      !req.body.goalData.start_date |
+      !req.body.goalData.end_date |
+      (typeof req.body.goalData.completed !== "boolean")
   ) {
     return sendResponse(
       res,

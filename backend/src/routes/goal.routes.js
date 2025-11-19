@@ -15,14 +15,14 @@ router.get("/goals", goalsController.getGoals);
 
 router.get("/goals", goalsController.getGoalsByStatus);
 
-router.get("/goals/find", goalsController.getGoalByName);
+router.get("/goals/find", goalsController.getGoalById);
 
 router.post("/goals", goalsController.createGoal);
 
-router.put("/goals/:name/validate", goalsController.validateGoalByName);
+router.put("/goals/:id/validate", goalsController.validateGoalById);
 
-router.put("/goals/:name", validatePutRoute, goalsController.updateGoalByName);
+router.put("/goals/:id", validatePutRoute, goalsController.updateGoal);
 
-router.delete("/goals/:name", goalsController.deleteGoal);
+router.delete("/goals/:id", goalsController.deleteGoal);
 
 export default router;

@@ -1,67 +1,154 @@
-const CreateGoalForm = () => {
+import { useState, useEffect } from "react";
+
+const CreateGoalForm = ({ onCreateGoal }) => {
+  const [goalData, setGoalData] = useState({
+    name: "",
+    start_date: "",
+    end_date: "",
+    completed: false,
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      setLoading(true);
+      const response = await fetch("http://localhost:4001/api/goals", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ goalData }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      onCreateGoal(goalData);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <span className="loading loading-spinner loading-lg"></span>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
+  console.log(goalData);
   return (
-    <div>
-      <h2>Create new Goal</h2>
-      <form id="create-goal-form">
-        <div className="form-group">
-          <label for="goal-name">Goal Name</label>
-          <input
-            type="text"
-            className="input"
-            id="goal-name"
-            aria-describedby="goalHelp"
-            placeholder="Get better grades..."
-          />
+    <div className="w-full">
+      <form
+        className="shadow-md rounder px-8 pt-6 pb-8 mb-4"
+        onSubmit={handleSubmit}
+      >
+        <h1 className="font-bold text-center text-5xl p-2">Create Goal</h1>
+        <div className="space-y-12">
+          <div className="border-b border-white/10 pb-12">
+            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+              <div className="sm:col-span-4">
+                <label
+                  htmlFor="name"
+                  className="block text-xl font-medium text-white"
+                >
+                  Goal Name
+                </label>
+                <div className="mt-2">
+                  <div className="flex items-center rounded-md bg-white/5 pl-3 outline-1 -outline-offset-1 outline-white/10 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-500">
+                    <div className="shrink-0 text-base text-gray-400 select-none sm:text-sm/6"></div>
+                    <input
+                      id="name"
+                      name="name"
+                      type="text"
+                      onChange={(e) =>
+                        setGoalData({ ...goalData, name: e.target.value })
+                      }
+                      value={goalData.name}
+                      placeholder="Eat healthier..."
+                      className="block min-w-0 grow bg-transparent py-1.5 pr-3 pl-1 text-base text-white placeholder:text-gray-500 focus:outline-none sm:text-sm/6"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-b border-white/10 pb-12">
+            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+              <div className="sm:col-span-3">
+                <label
+                  htmlFor="start-date"
+                  className="block text-xl font-medium text-white"
+                >
+                  Start Date
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="start-date"
+                    name="start-date"
+                    type="date"
+                    onChange={(e) =>
+                      setGoalData({
+                        ...goalData,
+                        start_date: e.target.value,
+                      })
+                    }
+                    value={goalData.start_date}
+                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
+                  />
+                </div>
+              </div>
+
+              <div className="sm:col-span-3">
+                <label
+                  htmlFor="end-date"
+                  className="block text-xl font-medium text-white"
+                >
+                  End Date
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="end-date"
+                    name="end-date"
+                    type="date"
+                    onChange={(e) =>
+                      setGoalData({
+                        ...goalData,
+                        end_date: e.target.value,
+                      })
+                    }
+                    value={goalData.end_date}
+                    className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
+                  />
+                </div>
+              </div>
+              <div>
+                <fieldset className="fieldset bg-base-100 border-base-300 rounded-box">
+                  <label className="label bg-base-100 text-xl">
+                    <input type="checkbox" className="checkbox" />
+                    Completed
+                  </label>
+                </fieldset>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="form-group">
-          <label for="goal-startDate">Start Date</label>
-          <input
-            type="date"
-            className="input"
-            id="goal-startDate"
-            placeholder="12/12/2024"
-          />
+
+        <div className="mt-6 flex items-center justify-end gap-x-6">
+          <button type="button" className="btn btn-error text-base-100">
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-success text-base-100">
+            Create
+          </button>
         </div>
-        <div className="form-group">
-          <label for="goal-endDate">End Date</label>
-          <input
-            type="date"
-            className="input"
-            id="goal-endDate"
-            placeholder="01/01/2025"
-          />
-        </div>
-        <div class="form-check">
-          <input
-            type="checkbox"
-            className="input"
-            id="goal-completedCheck"
-            name="true"
-          />
-          <label className="form-check-label" for="goal-completedCheck">
-            Completed
-          </label>
-        </div>
-        <button type="submit" className="btn btn-success" id="create-goal-btn">
-          Create
-        </button>
       </form>
-      <div role="alert" className="alert alert-success">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 shrink-0 stroke-current"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <span id="log">Your goal has been created!</span>
-      </div>
     </div>
   );
 };
