@@ -1,18 +1,18 @@
 import pkg from "pg";
-
-const { Pool } = pkg;
 import dotenv from "dotenv";
 dotenv.config();
 
-console.log("Connecting to the database...");
+const { Pool } = pkg;
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  ssl: { rejectUnauthorized: false }, // necesario para Neon
+  forceIPv4: true,
 });
 
-const res = await pool.query("SELECT NOW()");
-console.log(res.rows[0]);
+export function createQuery(pool) {
+  return (text, params) => pool.query(text, params);
+}
 
-export const query = (text, params) => pool.query(text, params);
+export const query = createQuery(pool);
 export default pool;
