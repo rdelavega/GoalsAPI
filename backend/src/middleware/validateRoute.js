@@ -14,10 +14,11 @@ export default function validateRoute(req, res, next) {
 
   if (
     req.method === "POST" &&
-    !req.body.goalData.name |
-      !req.body.goalData.start_date |
-      !req.body.goalData.end_date |
-      (typeof req.body.goalData.completed !== "boolean")
+    !req.body.goal_name |
+      !req.body.goal_category |
+      !req.body.start_date |
+      !req.body.end_date |
+      (typeof req.body.complete !== "boolean")
   ) {
     return sendResponse(
       res,

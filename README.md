@@ -172,10 +172,10 @@ cd GoalsAPI
 npm install
 ```
 
-### Agregar direccion de archivo json los siguientes archivos:
+### Agregar conexion a base de datos:
 
-- `src/controllers/goals.controller.js`
-- `src/tests/goals.test.js`
+- `touch database/.env`
+- DATABASE_URL=DATABASE_URL
 
 ### Correr servidor
 

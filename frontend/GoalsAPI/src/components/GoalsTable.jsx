@@ -1,7 +1,7 @@
 import { React, useEffect, useState } from "react";
 import CreateGoalForm from "./CreateGoalForm";
 
-const GoalsTable = (props) => {
+const GoalsTable = () => {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,10 +33,14 @@ const GoalsTable = (props) => {
 
     try {
       console.log(`Id to delete: ${goalId}`);
-      const res = await fetch(
+      const response = await fetch(
         `http://localhost:4001/api/goals/${goalId}`,
         requestOptions
       );
+
+      if (!response.ok) {
+        throw new Error("HTPP error!");
+      }
 
       const updatedGoals = goals.filter((goal) => goal.id !== goalId);
       setGoals(updatedGoals);
@@ -49,8 +53,20 @@ const GoalsTable = (props) => {
     setGoals((prev) => [...prev, newGoal]);
   };
 
+  const formatDate = (iso) => {
+    if (!iso) return "";
+    return iso.split("T")[0].split("-").reverse().join("/");
+  };
+
   if (loading) {
-    return <span className="loading loading-spinner loading-lg"></span>;
+    return (
+      <div className="text-center">
+        <p className="text-3xl font-bold p-12">Loading Goals</p>
+        <span className="loading loading-dots loading-lg text-center">
+          Loading Goals
+        </span>
+      </div>
+    );
   }
 
   if (error) {
@@ -59,19 +75,16 @@ const GoalsTable = (props) => {
 
   if (!goals) return null;
 
-  goals.map((goal) => {
-    console.log(goal.name);
-  });
-
   return (
     <>
-      <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 text-center p-10">
+      <div className="overflow-x-auto rounded-box border  bg-base-400 text-center p-10">
         <h2 className="text-5xl font-bold p-20">Current Goals</h2>
         <table className="table table-auto">
           <thead>
-            <tr className="text-xl text-[#ffffff] font-bold">
+            <tr className="text-xl text-base font-bold">
               <th>#</th>
               <th>Name</th>
+              <th>Category</th>
               <th>Start Date</th>
               <th>End Date</th>
               <th>Complete Status</th>
@@ -80,13 +93,14 @@ const GoalsTable = (props) => {
           <tbody id="table-body">
             {goals.map((goal, index) => {
               return (
-                <tr key={goal.id} className="hover:bg-base-300">
+                <tr key={goal.goal_id} className="hover:bg-base-300">
                   <td>{index + 1}</td>
-                  <td>{goal.name}</td>
-                  <td>{goal.start_date}</td>
-                  <td>{goal.end_date}</td>
+                  <td>{goal.goal_name}</td>
+                  <td>{goal.goal_category}</td>
+                  <td>{formatDate(goal.start_date)}</td>
+                  <td>{formatDate(goal.end_date)}</td>
                   <td>
-                    {goal.completed == true ? (
+                    {goal.complete == true ? (
                       <div className="badge badge-soft badge-success">
                         Completed
                       </div>
@@ -100,7 +114,6 @@ const GoalsTable = (props) => {
                     <button
                       className="btn btn-xs btn-success"
                       onClick={() => {
-                        console.log("clicked!");
                         goal.completed = true;
                         setGoals((prev) => [...prev]);
                       }}
@@ -115,7 +128,7 @@ const GoalsTable = (props) => {
                     <button
                       className="btn btn-error"
                       onClick={() => {
-                        handleDeleteGoal(goal);
+                        handleDeleteGoal(goal.goal_id);
                       }}
                     >
                       Delete
